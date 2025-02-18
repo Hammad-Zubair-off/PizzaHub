@@ -1,0 +1,13 @@
+.navbar-nav{
+    background-color: transparent;
+    margin-left: auto;
+}
+.navbar-brand{
+    background-color: transparent;
+    color: gray;
+    font-size: 40px;
+  }
+  .nav-link{
+    color: blue;
+    font-size: 25px;
+  }
