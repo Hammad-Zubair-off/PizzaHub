@@ -1,6 +1,7 @@
-Here's a README file for your **PizzaHub MERN Stack Project**:
+# Pizza Hub
 
----
+**Deployed Link:**  
+[Live Project](https://pizza-hub-six.vercel.app/)
 
 # PizzaHub 🍕  
 **A MERN Stack Pizza Ordering App**
