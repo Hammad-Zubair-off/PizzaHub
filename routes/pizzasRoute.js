@@ -19,8 +19,10 @@ router.post('/addpizza', authenticate, async (req, res) => {
             return res.status(400).json({ message: "All fields are required" });
         }
 
+
         const pizza = new Pizza({ name, varients, prices, category, image, description });
         const savedPizza = await pizza.save();
+        console.log(savedPizza);
         res.json(savedPizza);
     } catch (err) {
         return res.status(500).json({ message: "Internal Server Error" });
