@@ -6,24 +6,22 @@
 ## Screenshots
 
 ### Add Product
-![Add Product](./screenshoots/AddProduct.png)
+![Add Product](./screenshoots/AddProduct.jpg)
 
 ### Admin Login
-![Admin Login](./screenshoots/AdminLogin.png)
+![Admin Login](./screenshoots/AdminLogin.jpg)
 
 ### Cart
-![Cart](./screenshoots/cart.png)
+![Cart](./screenshoots/cart.jpg)
 
 ### Home
-![Home](./screenshoots/Home.png)
+![Home](./screenshoots/Home.jpg)
 
 ### Product Dashboard
-![Product Dashboard](./screenshoots/ProductDashboard.png)
+![Product Dashboard](./screenshoots/ProductDashboard.jpg)
 
 ### User Routes
-![User Routes](./screenshoots/UserRoutes.png)
-
-
+![User Routes](./screenshoots/UserRoutes.jpg)
 
 # PizzaHub 🍕  
 **A MERN Stack Pizza Ordering App**
