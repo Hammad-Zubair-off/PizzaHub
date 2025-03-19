@@ -1,38 +1,40 @@
-export const addToCart=(pizza,quantity,varient)=>(dispatch,getState)=>{
+// cartActions.js
+export const addToCart = (pizza, quantity, varient) => (dispatch, getState) => {
+    try {
+        // Debug log
+        console.log("Adding to cart:", { pizza, quantity, varient });
 
-    var cartItem={
-        name:pizza.name,
-        _id:pizza._id,
-        image:pizza.image,
-        varient:varient,
-        quantity:Number(quantity),
-        prices:pizza.prices,
-        price:pizza.prices[0][varient]*quantity
+        // Create a cart item with the correct structure
+        const cartItem = {
+            _id: pizza._id,
+            name: pizza.name,
+            image: pizza.image,
+            varient: varient,
+            quantity: quantity,
+            prices: pizza.prices  // This should be the full array of price objects
+        };
 
+        // Debug log
+        console.log("Cart item being added:", cartItem);
 
+        dispatch({ type: 'ADD_TO_CART', payload: cartItem });
+        
+        // Update localStorage
+        const cartItems = getState().cartReducer.cartItems;
+        localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    } catch (error) {
+        console.error("Error in addToCart:", error);
     }
-    if(cartItem.quantity>10){
-        alert('You cannot add more than 10 Items');
+};
+
+export const deleteFromCart = (pizza) => (dispatch, getState) => {
+    try {
+        dispatch({ type: 'DELETE_FROM_CART', payload: pizza });
+        
+        // Update localStorage
+        const cartItems = getState().cartReducer.cartItems;
+        localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    } catch (error) {
+        console.error("Error in deleteFromCart:", error);
     }
-    else if(cartItem.quantity<1){
-        dispatch({type:'DELETE_FROM_CART',payload:pizza})
-
-    const cartItems=getState().cartReducer.cartItems
-    localStorage.setItem('cartItems',JSON.stringify(cartItems))
-    }
-    else {
-    dispatch({type:'ADD_TO_CART',payload:cartItem})
-
-    const cartItems=getState().cartReducer.cartItems
-    localStorage.setItem('cartItems',JSON.stringify(cartItems))
-    }
-}
-
-
-export const deleteFromCart=(pizza)=>(dispatch,getState)=>{
-
-    dispatch({type:'DELETE_FROM_CART',payload:pizza})
-
-    const cartItems=getState().cartReducer.cartItems
-    localStorage.setItem('cartItems',JSON.stringify(cartItems))
-}
+};

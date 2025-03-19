@@ -1,34 +1,40 @@
-// Import necessary libraries
 import React, { useState } from 'react';
-import {useNavigate} from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
-// Define the AdminPanel component
 const Admin = () => {
   // State for admin name and password
-  const [adminName, setAdminName] = useState('hammad');
-  const [password, setPassword] = useState('123');
-
-  // History object for navigation
-  let navigate=useNavigate();
+  const [adminName, setAdminName] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   // Function to handle form submission
-  const handleLogin = () => {
-    // Check if the provided credentials are correct
-    if (adminName === 'hammad' && password === '123') {
-      // Navigate to another screen (replace '/dashboard' with your desired route)
-      navigate('/productList');
-    } else {
-      // Show an alert for incorrect password
-      alert('Sorry, incorrect password');
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post('/api/admin/login', {
+        username: adminName,
+        password: password,
+      });
+
+      if (response.data.success) {
+        alert('Login Successful!');
+        navigate('/productList');
+      } else {
+        alert('Invalid credentials. Please try again.');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('Something went wrong. Please try again.');
     }
   };
 
-  // JSX for the login form
   return (
     <div className="container">
       <div className="row justify-content-center mt-5">
         <div className="col-md-4">
-          <form>
+          <form onSubmit={handleLogin}>
             <div className="mb-3">
               <label htmlFor="adminName" className="form-label">
                 Admin Name
@@ -39,6 +45,7 @@ const Admin = () => {
                 id="adminName"
                 value={adminName}
                 onChange={(e) => setAdminName(e.target.value)}
+                required
               />
             </div>
             <div className="mb-3">
@@ -51,13 +58,10 @@ const Admin = () => {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </div>
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={handleLogin}
-            >
+            <button type="submit" className="btn btn-primary w-100">
               Login
             </button>
           </form>

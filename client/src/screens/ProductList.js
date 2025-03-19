@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import {useNavigate} from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+
 const ProductList = () => {
-  let navigate=useNavigate();
+  let navigate = useNavigate();
 
   // State to store the list of products
   const [products, setProducts] = useState([]);
@@ -24,41 +25,50 @@ const ProductList = () => {
     fetchProducts();
   }, []);
 
-  // Function to handle product deletion
-  const handleDelete = (productId) => {
-    const updatedProducts = products.filter((product) => product.id !== productId);
-    setProducts(updatedProducts);
-  };
-
-  // Function to handle product editing (you can implement a separate EditProduct component)
+  // Function to handle product editing
   const handleEdit = (product) => {
-    // Implement edit logic, for example, navigate to an edit page with the product details
-   
     navigate('/edit', { state: { data: product } });
-    
   };
 
   // Function to navigate to the AddProduct component
-  const handleAddProduct = (product) => {
+  const handleAddProduct = () => {
     navigate('/add');
   };
 
-
-  const handleDelet = (id) => {
+  const handleDelete = (id) => {
     const confirmDelete = window.confirm('Are you sure you want to delete this product?');
     if (confirmDelete) {
-      axios.delete(`/api/pizzas/deletepizza/${id}`)
+      // Get the token from wherever you're storing it after login
+      // This might be localStorage, sessionStorage, or a state management solution
+      // Make sure to use the same key you used when storing the token
+      const token = localStorage.getItem('token'); // Adjust this based on your authentication setup
+      
+      if (!token) {
+        alert('Authentication token not found. Please log in again.');
+        // Optionally redirect to login page
+        // navigate('/login');
+        return;
+      }
+
+      // Make sure to include the 'Bearer ' prefix if your authentication middleware expects it
+      const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+      
+      axios.delete(`/api/pizzas/deletepizza/${id}`, {
+        headers: {
+          'Authorization': authHeader
+        }
+      })
         .then(response => {
-          // Handle success response
-          alert('Product deleted successfully. Kindly reload the page to see results.');
-          // Optionally, you can perform additional actions such as updating state
+          alert('Product deleted successfully!');
+          setProducts(products.filter(product => product._id !== id));
         })
         .catch(error => {
-          // Handle error response
-          alert('Error deleting product');
+          console.error('Delete error:', error.response?.data || error.message);
+          alert(`Error deleting product: ${error.response?.data?.message || error.message}`);
         });
     }
   };
+
   return (
     <div className="container mt-5">
       <h2>Product List</h2>
@@ -75,7 +85,7 @@ const ProductList = () => {
         </thead>
         <tbody>
           {products.map((product) => (
-            <tr key={product.id}>
+            <tr key={product._id}>
               <td>
                 <img
                   src={product.image}
@@ -87,7 +97,7 @@ const ProductList = () => {
               <td>
                 <button
                   className="btn btn-danger mr-2"
-                  onClick={() => handleDelet(product._id)}
+                  onClick={() => handleDelete(product._id)}
                 >
                   Delete
                 </button>

@@ -17,15 +17,15 @@ function App() {
     <div className="App">
       <Navbar/>
       <Routes>
-<Route path='/' element={<Homescreen/>} />
-<Route path='admin' element={<Admin/>} />
-<Route path='productList' element={<ProductList/>} />
-<Route path='edit' element={<EditProduct/>} />
-<Route path='edit' element={<EditProduct/>} />
-<Route path='add' element={<AddProduct/>} />     
-<Route path='cart' element={<Cartscreen/>} />
-<Route path='Registerscreen' element={<Registerscreen/>}/>
-<Route path='About' element={<About/>}/>
+  <Route path='/' element={<Homescreen/>} />
+  <Route path='/admin' element={<Admin/>} />
+  <Route path='/productList' element={<ProductList/>} />
+  <Route path='/edit' element={<EditProduct/>} />
+  <Route path='/add' element={<AddProduct/>} />     
+  <Route path='/cart' element={<Cartscreen/>} />
+  <Route path='/Registerscreen' element={<Registerscreen/>}/>
+  <Route path='/Loginscreen' element={<Loginscreen/>}/>
+  <Route path='/About' element={<About/>}/>
 
         </Routes>
   

@@ -1,20 +1,21 @@
-const mongoose=require('mongoose')
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 
+dotenv.config();
 
-const uri = 'mongodb+srv://hammad123:hammad123@portfolio.yy8pt1e.mongodb.net/';
+const uri = `${process.env.MONGO_URI}PizzaHub`;
 
 const options = {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    
     family: 4 // Use IPv4, skip trying IPv6
-}
+};
 
+// Export the function using module.exports
 const connectWithDB = () => {
-    mongoose.connect(uri, options, (err, db) => {
-      if (err) console.error(err);
-      else console.log("database connection succedded");
-    })
-}
+    mongoose.connect(uri, options)
+        .then(() => console.log("✅ Database connection successful"))
+        .catch(err => console.error("❌ Database connection error:", err));
+};
 
-connectWithDB()
+module.exports = connectWithDB;

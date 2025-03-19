@@ -1,32 +1,35 @@
-import React,{useState,useEffect} from 'react'
-import {useDispatch,useSelector} from 'react-redux'
-import { getAllPizzas } from '../actions/pizzaActions'
-import Pizza from '../components/Pizza'
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllPizzas } from "../actions/pizzaActions";
+import Pizza from "../components/Pizza";
+import Loader from "../components/Loader";
+import Error from "../components/Error";
 
-export default function Homescreen(){
+export default function Homescreen() {
+  const dispatch = useDispatch();
+  const pizzasState = useSelector((state) => state.getAllPizzasReducer);
+  const { pizzas, error, loading } = pizzasState;
 
-    const dispatch=useDispatch()
-    const pizzasstates=useSelector(state=>state.getAllPizzasReducer);
-    const {pizzas,error,loading}=pizzasstates
-    useEffect(()=>{
-        dispatch(getAllPizzas());
-    },[])
-    
-    return (
-        <div>
-            <div className='row'>
-                {loading ? (<h1>Loading...</h1>):error ? (<h1>Error couldn't find data........</h1>):(
- pizzas.map(pizza=>{
-    return <div className='col-md-4'>
-        <div>
-            <Pizza pizza={pizza} />
-            </div>
-        </div>
+  useEffect(() => {
+    dispatch(getAllPizzas());
+  }, [dispatch]);
 
- })
-                )}
-        
-            </div>
-        </div>
-    )
+  return (
+    <div className="container mt-4">
+      {loading && <Loader />}
+      {error && <Error message="Error fetching pizzas. Please try again later." />}
+      
+      <div className="row">
+        {pizzas &&
+          pizzas.map((pizza) => {
+            console.log(pizza); // Debugging log
+            return (
+              <div key={pizza._id} className="col-md-4 p-2">
+                <Pizza pizza={pizza} />
+              </div>
+            );
+          })}
+      </div>
+    </div>
+  );
 }
