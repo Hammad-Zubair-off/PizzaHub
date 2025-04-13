@@ -3,6 +3,26 @@
 **Deployed Link:**  
 [Live Project](https://pizza-hub-six.vercel.app/)
 
+## Screenshots
+
+### Add Product
+![Add Product](./screenshoots/AddProduct.jpg)
+
+### Admin Login
+![Admin Login](./screenshoots/AdminLogin.jpg)
+
+### Cart
+![Cart](./screenshoots/cart.jpg)
+
+### Home
+![Home](./screenshoots/Home.jpg)
+
+### Product Dashboard
+![Product Dashboard](./screenshoots/ProductDashboard.jpg)
+
+### User Routes
+![User Routes](./screenshoots/UserRoutes.jpg)
+
 # PizzaHub 🍕  
 **A MERN Stack Pizza Ordering App**
 
