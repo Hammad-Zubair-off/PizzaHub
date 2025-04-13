@@ -14,6 +14,7 @@ app.use(express.json()); // Parse JSON
 app.use(cors()); // Enable CORS
 
 // Routes
+// added
 const pizzasRoute = require('./routes/pizzasRoute');
 const authRoutes = require('./routes/authRoutes');
 
