@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
-import { Card, Badge, Modal, Row, Col } from 'react-bootstrap';
+import { Card, Badge, Modal, Row, Col, Form } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../actions/cartActions';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './PizzaCard.css';
 
 const PizzaCard = ({ pizza }) => {
     const [modalShow, setModalShow] = useState(false);
     const [selectedVarient, setSelectedVarient] = useState(pizza.varients[0]);
+    const [quantity, setQuantity] = useState(1);
     const dispatch = useDispatch();
 
     const handleAddToCart = () => {
-        dispatch(addToCart(pizza, selectedVarient, 1));
+        dispatch(addToCart(pizza, selectedVarient, quantity));
+        toast.success('Product added to cart!');
     };
 
     const getPrice = (varient) => {
@@ -55,7 +59,7 @@ const PizzaCard = ({ pizza }) => {
                         {pizza.description}
                     </Card.Text>
                     <div className="price-tag">
-                        From ₹{Math.min(...pizza.prices.map(p => p.price))}
+                        From Rs. {Math.min(...pizza.prices.map(p => p.price))}
                     </div>
                 </Card.Body>
             </Card>
@@ -141,17 +145,27 @@ const PizzaCard = ({ pizza }) => {
                                             onClick={() => setSelectedVarient(varient)}
                                         >
                                             {varient}
-                                            <span className="price">₹{getPrice(varient)}</span>
+                                            <span className="price">Rs. {getPrice(varient)}</span>
                                         </button>
                                     ))}
                                 </div>
                             </div>
-
+                            <div className="quantity-input mt-3">
+                                <h5>Quantity:</h5>
+                                <Form.Control
+                                    type="number"
+                                    min={1}
+                                    max={10}
+                                    value={quantity}
+                                    onChange={e => setQuantity(Math.max(1, Math.min(10, Number(e.target.value))))}
+                                    style={{ width: '80px', display: 'inline-block' }}
+                                />
+                            </div>
                             <button 
                                 className="btn btn-primary w-100 mt-4"
                                 onClick={handleAddToCart}
                             >
-                                Add to Cart - ₹{getPrice(selectedVarient)}
+                                Add to Cart - Rs. {getPrice(selectedVarient)}
                             </button>
                         </Col>
                     </Row>

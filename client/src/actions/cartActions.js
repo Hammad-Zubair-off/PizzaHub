@@ -5,10 +5,12 @@ import {
     UPDATE_CART_ITEM,
     CLEAR_CART
 } from '../constants/cartConstants';
+import { toast } from 'react-toastify';
 
 // Add item to cart
 export const addToCart = (pizza, variant = 'small', quantity = 1) => (dispatch, getState) => {
-    const variantPrice = pizza.prices.find(p => p.size.toLowerCase() === variant.toLowerCase());
+    // Use 'varient' instead of 'size' for price lookup
+    const variantPrice = pizza.prices.find(p => p.varient && p.varient.toLowerCase() === variant.toLowerCase());
     
     const cartItem = {
         _id: pizza._id,
@@ -43,6 +45,8 @@ export const addToCart = (pizza, variant = 'small', quantity = 1) => (dispatch, 
     } else {
         localStorage.setItem(storageKey, JSON.stringify([...cartItems, cartItem]));
     }
+
+    toast.success('Product added to cart!', {autoClose: 1500 });
 };
 
 // Remove item from cart
@@ -72,8 +76,8 @@ export const updateCartItemQuantity = (id, variant, quantity) => (dispatch, getS
     // Get current user's ID from state
     const userId = getState().userLogin?.userInfo?._id;
     const storageKey = userId ? `cartItems_${userId}` : 'cartItems';
-
-    // Update localStorage
+        
+        // Update localStorage
     const cartItems = JSON.parse(localStorage.getItem(storageKey) || '[]');
     const updatedCartItems = cartItems.map(item =>
         item._id === id && item.variant === variant

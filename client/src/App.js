@@ -18,12 +18,14 @@ import UserManagement from './screens/UserManagement';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import AdminLogin from './screens/AdminLogin';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
   return (
     <AuthProvider>
       <div className="App">
         <Navbar/>
+        <ToastContainer />
         <Routes>
           {/* Public Routes */}
           <Route path='/' element={<Homescreen/>} />

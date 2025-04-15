@@ -7,17 +7,17 @@ import Loader from '../components/Loader';
 import SearchBar from '../components/SearchBar';
 
 const Homescreen = () => {
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
     const [category, setCategory] = useState('all');
     const [sort, setSort] = useState('');
 
     const { loading, error, pizzas } = useSelector(state => state.pizzaReducer);
 
-    useEffect(() => {
+  useEffect(() => {
         dispatch(fetchPizzas(category !== 'all' ? category : '', sort));
     }, [dispatch, category, sort]);
 
-    return (
+  return (
         <Container className="py-5">
             <Row className="my-4">
                 <Col md={8}>

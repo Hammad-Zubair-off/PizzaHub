@@ -1,6 +1,6 @@
 // store.js
 import { createStore, applyMiddleware, combineReducers } from 'redux';
-import { thunk } from 'redux-thunk';
+import {thunk} from 'redux-thunk';
 
 import pizzaReducer from './reducers/pizzaReducer';
 import authReducer from './reducers/authReducer';
