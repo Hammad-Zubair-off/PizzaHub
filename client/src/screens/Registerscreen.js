@@ -1,123 +1,128 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import AuthForm from '../components/AuthForm';
+import FormInput from '../components/FormInput';
 
 export default function Registerscreen() {
-  let navigate = useNavigate();
-
-  const [user, setUser] = useState({
+  const navigate = useNavigate();
+  const { register, error, loading } = useAuth();
+  const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
-    cpassword: '',
+    cpassword: ''
   });
+  const [formErrors, setFormErrors] = useState({});
 
-  const handleInputs = (e) => {
-    const { name, value } = e.target; // ✅ Correct way to get name and value
-    setUser({ ...user, [name]: value });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    
+    // Clear error when user starts typing
+    if (formErrors[name]) {
+      setFormErrors({ ...formErrors, [name]: '' });
+    }
   };
 
-  const PostData = async (e) => {
-    e.preventDefault(); // ✅ Prevent default form submission
+  const validateForm = () => {
+    const errors = {};
+    
+    if (!formData.name) {
+      errors.name = 'Name is required';
+    }
+    
+    if (!formData.email) {
+      errors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = 'Email is invalid';
+    }
+    
+    if (!formData.password) {
+      errors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      errors.password = 'Password must be at least 6 characters';
+    }
+    
+    if (!formData.cpassword) {
+      errors.cpassword = 'Confirm password is required';
+    } else if (formData.password !== formData.cpassword) {
+      errors.cpassword = 'Passwords do not match';
+    }
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
-    const { name, email, password, cpassword } = user;
-
-    try {
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, cpassword }),
-      });
-
-      const data = await res.json(); // ✅ Await response JSON
-
-      if (res.status === 422) {
-        alert('Email already exists');
-      } else if (res.status === 423) {
-        alert('Credentials did not match');
-      } else {
-        alert('Registration Successful!');
-        navigate('/Loginscreen');
-      }
-    } catch (error) {
-      console.error('Registration error:', error);
-      alert('Something went wrong. Please try again.');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+    
+    const { name, email, password } = formData;
+    const result = await register({ name, email, password });
+    
+    if (result.success) {
+      navigate('/login');
     }
   };
 
   return (
-    <div className="container" style={{ backgroundColor: 'transparent' }}>
-      <div className="row">
-        <div className="col-sm-9 col-md-7 col-lg-5 mx-auto">
-          <div className="card border-0 shadow rounded-3 my-5">
-            <div className="card-body p-4 p-sm-5">
-              <h5 className="card-title text-center mb-5 fw-light fs-5">
-                Register Yourself
-              </h5>
-              <form onSubmit={PostData}>
-                <div className="form-floating mb-3">
-                  <input
+    <AuthForm
+      title="Create Account"
+      submitText="Register"
+      onSubmit={handleSubmit}
+      error={error}
+      loading={loading}
+      footerText="Already have an account?"
+      footerLinkText="Sign In"
+      footerLinkTo="/login"
+    >
+      <FormInput
+        label="Full Name"
                     type="text"
-                    className="form-control"
                     name="name"
-                    id="floatingInput"
-                    placeholder="Name"
-                    value={user.name}
-                    onChange={handleInputs}
+        value={formData.name}
+        onChange={handleChange}
+        placeholder="John Doe"
                     required
-                  />
-                  <label htmlFor="name">Name</label>
-                </div>
-                <div className="form-floating mb-3">
-                  <input
+        error={formErrors.name}
+      />
+      
+      <FormInput
+        label="Email Address"
                     type="email"
-                    className="form-control"
                     name="email"
-                    id="floatingInput"
+        value={formData.email}
+        onChange={handleChange}
                     placeholder="name@example.com"
-                    value={user.email}
-                    onChange={handleInputs}
                     required
-                  />
-                  <label htmlFor="email">Email address</label>
-                </div>
-                <div className="form-floating mb-3">
-                  <input
+        error={formErrors.email}
+      />
+      
+      <FormInput
+        label="Password"
                     type="password"
                     name="password"
-                    className="form-control"
-                    id="floatingPassword"
+        value={formData.password}
+        onChange={handleChange}
                     placeholder="Password"
-                    value={user.password}
-                    onChange={handleInputs}
                     required
-                  />
-                  <label htmlFor="password">Password</label>
-                </div>
-                <div className="form-floating mb-3">
-                  <input
+        error={formErrors.password}
+      />
+      
+      <FormInput
+        label="Confirm Password"
                     type="password"
                     name="cpassword"
-                    className="form-control"
-                    id="floatingPasswordConfirm"
+        value={formData.cpassword}
+        onChange={handleChange}
                     placeholder="Confirm Password"
-                    value={user.cpassword}
-                    onChange={handleInputs}
                     required
-                  />
-                  <label htmlFor="cpassword">Confirm Password</label>
-                </div>
-
-                <div className="d-grid">
-                  <button className="btn btn-primary btn-login text-uppercase fw-bold" type="submit">
-                    Register
-                  </button>
-                </div>
-                <hr className="my-4" />
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+        error={formErrors.cpassword}
+      />
+    </AuthForm>
   );
 }

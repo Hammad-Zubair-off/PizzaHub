@@ -1,21 +1,49 @@
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
+require('dotenv').config();
 
-dotenv.config();
+const connectWithDB = async () => {
+    try {
+        // Set mongoose options
+        mongoose.set('strictQuery', false);
+        
+        // Set up mongoose connection options
+        const options = {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            serverSelectionTimeoutMS: 30000, // Increase timeout to 30 seconds
+            socketTimeoutMS: 45000,
+            family: 4
+        };
 
-const uri = `${process.env.MONGO_URI}PizzaHub`;
+        // Connect to MongoDB Atlas
+        const conn = await mongoose.connect(process.env.MONGO_URI, options);
+        console.log("✅ MongoDB Atlas connection successful");
+        
+        // Handle connection events
+        mongoose.connection.on('error', err => {
+            console.error('MongoDB connection error:', err);
+        });
 
-const options = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    family: 4 // Use IPv4, skip trying IPv6
-};
+        mongoose.connection.on('disconnected', () => {
+            console.log('MongoDB disconnected');
+        });
 
-// Export the function using module.exports
-const connectWithDB = () => {
-    mongoose.connect(uri, options)
-        .then(() => console.log("✅ Database connection successful"))
-        .catch(err => console.error("❌ Database connection error:", err));
+        // Handle process termination
+        process.on('SIGINT', async () => {
+            try {
+                await mongoose.connection.close();
+                console.log('MongoDB connection closed through app termination');
+                process.exit(0);
+            } catch (err) {
+                console.error('Error during MongoDB connection closure:', err);
+                process.exit(1);
+            }
+        });
+
+    } catch (error) {
+        console.error('Error connecting to MongoDB Atlas:', error.message);
+        process.exit(1);
+    }
 };
 
 module.exports = connectWithDB;

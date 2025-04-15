@@ -1,73 +1,87 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
+import AuthForm from '../components/AuthForm';
+import FormInput from '../components/FormInput';
 
 const Admin = () => {
-  // State for admin name and password
-  const [adminName, setAdminName] = useState('');
-  const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const { adminLogin, error, loading } = useAuth();
+  const [formData, setFormData] = useState({
+    username: '',
+    password: ''
+  });
+  const [formErrors, setFormErrors] = useState({});
 
-  // Function to handle form submission
-  const handleLogin = async (e) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    
+    // Clear error when user starts typing
+    if (formErrors[name]) {
+      setFormErrors({ ...formErrors, [name]: '' });
+    }
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    
+    if (!formData.username) {
+      errors.username = 'Username is required';
+    }
+    
+    if (!formData.password) {
+      errors.password = 'Password is required';
+    }
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    try {
-      const response = await axios.post('/api/admin/login', {
-        username: adminName,
-        password: password,
-      });
-
-      if (response.data.success) {
-        alert('Login Successful!');
-        navigate('/productList');
-      } else {
-        alert('Invalid credentials. Please try again.');
-      }
-    } catch (error) {
-      console.error('Login error:', error);
-      alert('Something went wrong. Please try again.');
+    
+    if (!validateForm()) {
+      return;
+    }
+    
+    const result = await adminLogin(formData.username, formData.password);
+    
+    if (result.success) {
+      navigate('/productList');
     }
   };
 
   return (
-    <div className="container">
-      <div className="row justify-content-center mt-5">
-        <div className="col-md-4">
-          <form onSubmit={handleLogin}>
-            <div className="mb-3">
-              <label htmlFor="adminName" className="form-label">
-                Admin Name
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                id="adminName"
-                value={adminName}
-                onChange={(e) => setAdminName(e.target.value)}
-                required
-              />
-            </div>
-            <div className="mb-3">
-              <label htmlFor="password" className="form-label">
-                Password
-              </label>
-              <input
-                type="password"
-                className="form-control"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <button type="submit" className="btn btn-primary w-100">
-              Login
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
+    <AuthForm
+      title="Admin Login"
+      submitText="Login as Admin"
+      onSubmit={handleSubmit}
+      error={error}
+      loading={loading}
+    >
+      <FormInput
+        label="Username"
+        type="text"
+        name="username"
+        value={formData.username}
+        onChange={handleChange}
+        placeholder="Admin Username"
+        required
+        error={formErrors.username}
+      />
+      
+      <FormInput
+        label="Password"
+        type="password"
+        name="password"
+        value={formData.password}
+        onChange={handleChange}
+        placeholder="Admin Password"
+        required
+        error={formErrors.password}
+      />
+    </AuthForm>
   );
 };
 

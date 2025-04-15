@@ -1,0 +1,286 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "PizzaHub API",
+    "description": "API documentation for PizzaHub application"
+  },
+  "host": "localhost:5000",
+  "basePath": "/api",
+  "schemes": ["http"],
+  "paths": {
+    "/pizzas": {
+      "get": {
+        "tags": ["Pizzas"],
+        "summary": "Get all pizzas", 
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "description": "Filter pizzas by category (veg/non-veg)",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort pizzas by (popular/rating)",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Pizza"
+              }
+            }
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Pizzas"],
+        "summary": "Add a new pizza",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Pizza object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Pizza"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Pizza created successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/pizzas/{id}": {
+      "get": {
+        "tags": ["Pizzas"],
+        "summary": "Get pizza by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/Pizza"
+            }
+          },
+          "404": {
+            "description": "Pizza not found"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Pizzas"],
+        "summary": "Update pizza",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Pizza"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pizza updated successfully"
+          },
+          "404": {
+            "description": "Pizza not found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Pizzas"],
+        "summary": "Delete pizza",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pizza deleted successfully"
+          },
+          "404": {
+            "description": "Pizza not found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/admin/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Admin login",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Pizza": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "varients": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "prices": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "varient": {
+                "type": "string"
+              },
+              "price": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "category": {
+          "type": "string",
+          "enum": ["Veg", "Non-Veg"]
+        },
+        "image": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "isAvailable": {
+          "type": "boolean"
+        },
+        "rating": {
+          "type": "number"
+        },
+        "popularity": {
+          "type": "number"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ingredients": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cookingTime": {
+          "type": "number"
+        },
+        "spiceLevel": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  }
+} 

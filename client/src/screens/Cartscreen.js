@@ -1,102 +1,131 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { addToCart, deleteFromCart } from '../actions/cartActions';
+import { Row, Col, ListGroup, Image, Button, Alert } from 'react-bootstrap';
+import { FaTrash, FaPlus, FaMinus } from 'react-icons/fa';
+import { removeFromCart, updateCartItemQuantity } from '../actions/cartActions';
+import ProceedToCheckout from '../components/ProceedToCheckout';
 
-export default function Cartscreen() {
-    const cartState = useSelector(state => state.cartReducer);
-    const cartItems = cartState.cartItems || [];
+const CartScreen = () => {
     const dispatch = useDispatch();
+    // Access cartReducer state with proper structure
+    const cartState = useSelector((state) => state.cartReducer);
+    const { cartItems = [], error } = cartState || {};
 
-    // Debug log - remove in production
-    console.log("Cart Items in Cartscreen:", cartItems);
+    const removeFromCartHandler = (id, variant) => {
+        try {
+            dispatch(removeFromCart(id, variant));
+        } catch (error) {
+            console.error('Error removing item from cart:', error);
+        }
+    };
 
-    // Calculate subtotal safely
-    const subtotal = cartItems.reduce((total, item) => {
-        if (!item || !item.prices || !item.varient) return total;
-        
-        // Find the price for this variant
-        const priceObj = item.prices.find(p => p.varient === item.varient);
-        const price = priceObj ? priceObj.price : 0;
-        
-        return total + (item.quantity * price);
-    }, 0);
-
-    // Handler for updating quantity
-    const handleQuantityChange = (item, newQuantity) => {
-        dispatch(addToCart(item, newQuantity, item.varient));
+    const updateQuantityHandler = (id, variant, quantity) => {
+        try {
+            if (quantity > 0 && quantity <= 10) {
+                dispatch(updateCartItemQuantity(id, variant, quantity));
+            }
+        } catch (error) {
+            console.error('Error updating quantity:', error);
+        }
     };
 
     return (
-        <div className="container mt-4">
-            <div className="row justify-content-center">
-                <div className="col-md-7">
-                    <h2 className="text-center mb-4" style={{ fontSize: '36px' }}>🛒 My Cart</h2>
-                    
-                    {cartItems.length === 0 ? (
-                        <h4 className="text-center text-muted">Your cart is empty.</h4>
-                    ) : (
-                        cartItems.map((item) => {
-                            if (!item) return null;
-                            
-                            // Get price for this variant
-                            const priceObj = item.prices && item.prices.find(p => p.varient === item.varient);
-                            const price = priceObj ? priceObj.price : 0;
-                            
-                            return (
-                                <div key={item._id} className="d-flex align-items-center justify-content-between border p-3 mb-2 shadow-sm rounded">
-                                    {/* Left Section - Product Info */}
-                                    <div className="w-50">
-                                        <h5>{item.name} <small>({item.varient})</small></h5>
-                                        <p className="mb-1">
-                                            Price: {item.quantity} × {price} = <b>Rs. {item.quantity * price}</b>
-                                        </p>
-                                        
-                                        {/* Quantity Buttons */}
-                                        <div className="d-flex align-items-center">
-                                            <button
-                                                className="btn btn-sm btn-outline-primary me-2"
-                                                onClick={() => handleQuantityChange(item, item.quantity + 1)}
-                                            >
-                                                <i className="fa fa-plus"></i>
-                                            </button>
-                                            <span className="fw-bold">{item.quantity}</span>
-                                            <button
-                                                className="btn btn-sm btn-outline-danger ms-2"
-                                                onClick={() => {
-                                                    if (item.quantity > 1) {
-                                                        handleQuantityChange(item, item.quantity - 1);
+        <div className="cart-screen">
+            <h2 className="text-center mb-4">
+                <i className="fas fa-shopping-cart"></i> My Cart
+            </h2>
+
+            {error && (
+                <Alert variant="danger" className="mb-4">
+                    {error}
+                </Alert>
+            )}
+            
+            {!cartItems || cartItems.length === 0 ? (
+                <div className="text-center">
+                    <h3>Your cart is empty</h3>
+                    <p>Add some delicious pizzas to get started!</p>
+                </div>
+            ) : (
+                <Row>
+                    <Col md={8}>
+                        <ListGroup variant="flush">
+                            {cartItems.map((item) => (
+                                <ListGroup.Item key={`${item._id}-${item.variant}`}>
+                                    <Row className="align-items-center">
+                                        <Col md={2}>
+                                            <Image src={item.image} alt={item.name} fluid rounded />
+                                        </Col>
+                                        <Col md={3}>
+                                            <h5>{item.name}</h5>
+                                            <p className="mb-0">Size: {item.variant}</p>
+                                        </Col>
+                                        <Col md={2}>
+                                            <p className="mb-0">Rs. {item.price}/-</p>
+                                            <small className="text-muted">
+                                                Total: Rs. {(item.price * item.quantity).toFixed(2)}/-
+                                            </small>
+                                        </Col>
+                                        <Col md={3}>
+                                            <div className="d-flex align-items-center quantity-selector">
+                                                <Button
+                                                    variant="outline-secondary"
+                                                    size="sm"
+                                                    onClick={() => 
+                                                        updateQuantityHandler(item._id, item.variant, item.quantity - 1)
                                                     }
-                                                }}
-                                                disabled={item.quantity <= 1}
+                                                    disabled={item.quantity <= 1}
+                                                >
+                                                    <FaMinus />
+                                                </Button>
+                                                <span className="mx-2">{item.quantity}</span>
+                                                <Button
+                                                    variant="outline-secondary"
+                                                    size="sm"
+                                                    onClick={() => 
+                                                        updateQuantityHandler(item._id, item.variant, item.quantity + 1)
+                                                    }
+                                                    disabled={item.quantity >= 10}
+                                                >
+                                                    <FaPlus />
+                                                </Button>
+                                            </div>
+                                        </Col>
+                                        <Col md={2}>
+                                            <Button
+                                                variant="danger"
+                                                onClick={() => removeFromCartHandler(item._id, item.variant)}
                                             >
-                                                <i className="fa fa-minus"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    {/* Middle Section - Image */}
-                                    <div className="text-center">
-                                        <img src={item.image} alt={item.name} className="rounded" height="80px" width="80px" />
-                                    </div>
-
-                                    {/* Right Section - Delete Icon */}
-                                    <div>
-                                        <button className="btn btn-sm btn-outline-danger" onClick={() => dispatch(deleteFromCart(item))}>
-                                            <i className="fa fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            );
-                        })
-                    )}
-                </div>
-
-                {/* Subtotal & Checkout */}
-                <div className="col-md-4 text-center">
-                    <h3 className="fw-bold">Subtotal: Rs. {subtotal}/-</h3>
-                    <button className="btn btn-success w-100 mt-3">Proceed to Checkout</button>
-                </div>
-            </div>
+                                                <FaTrash />
+                                            </Button>
+                                        </Col>
+                                    </Row>
+                                </ListGroup.Item>
+                            ))}
+                        </ListGroup>
+                    </Col>
+                    <Col md={4}>
+                        <ProceedToCheckout cartItems={cartItems} />
+                    </Col>
+                </Row>
+            )}
+            <style jsx>{`
+                .cart-screen {
+                    padding: 20px;
+                }
+                .quantity-selector {
+                    justify-content: center;
+                }
+                .quantity-selector span {
+                    min-width: 30px;
+                    text-align: center;
+                }
+                .text-muted {
+                    font-size: 0.875rem;
+                }
+            `}</style>
         </div>
     );
-}
+};
+
+export default CartScreen;

@@ -1,0 +1,170 @@
+.pizza-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.pizza-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.pizza-image-wrapper {
+    position: relative;
+    padding-top: 75%;
+    overflow: hidden;
+}
+
+.pizza-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.pizza-card:hover .pizza-image {
+    transform: scale(1.05);
+}
+
+.category-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    border-radius: 20px;
+}
+
+.popular-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    border-radius: 20px;
+}
+
+.pizza-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #2d3748;
+}
+
+.pizza-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+    color: #718096;
+    font-size: 0.875rem;
+}
+
+.rating, .cooking-time {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.spice-level {
+    margin-bottom: 0.5rem;
+}
+
+.spice-level i {
+    margin-right: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.description-truncate {
+    color: #718096;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 0.875rem;
+}
+
+.price-tag {
+    font-weight: 600;
+    color: var(--bs-primary);
+    margin-top: 0.5rem;
+}
+
+/* Modal Styles */
+.pizza-modal .modal-content {
+    border-radius: 12px;
+    border: none;
+}
+
+.modal-image {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.meta-details {
+    display: flex;
+    justify-content: space-between;
+    margin: 1rem 0;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.rating-box, .cooking-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.ingredients-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.varient-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.varient-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.75rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: none;
+    transition: all 0.2s ease;
+}
+
+.varient-btn:hover {
+    border-color: var(--bs-primary);
+}
+
+.varient-btn.active {
+    border-color: var(--bs-primary);
+    background-color: var(--bs-primary);
+    color: white;
+}
+
+.varient-btn .price {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-top: 0.25rem;
+}
+
+.description {
+    color: #4a5568;
+    line-height: 1.6;
+} 

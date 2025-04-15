@@ -1,29 +1,35 @@
 // store.js
-import { combineReducers } from 'redux';
-import { createStore, applyMiddleware } from 'redux';
-import thunk from 'redux-thunk';
-import { composeWithDevTools } from 'redux-devtools-extension';
+import { createStore, applyMiddleware, combineReducers } from 'redux';
+import { thunk } from 'redux-thunk';
 
-import { getAllPizzasReducer } from './reducers/pizzaReducers';
-import { cartReducer } from './reducers/cartReducer';
+import pizzaReducer from './reducers/pizzaReducer';
+import authReducer from './reducers/authReducer';
+import cartReducer from './reducers/cartReducer';
 
-// Initialize cart state properly
-const cartItems = localStorage.getItem('cartItems')
+// Get cart items from localStorage
+const cartItemsFromStorage = localStorage.getItem('cartItems')
     ? JSON.parse(localStorage.getItem('cartItems'))
     : [];
 
+// Get user info from localStorage
+const userInfoFromStorage = localStorage.getItem('userInfo')
+    ? JSON.parse(localStorage.getItem('userInfo'))
+    : null;
+
 const initialState = {
     cartReducer: {
-        cartItems: cartItems
+        cartItems: cartItemsFromStorage
     },
-    getAllPizzasReducer: {
-        pizzas: []
+    authReducer: {
+        user: userInfoFromStorage,
+        isAuthenticated: !!userInfoFromStorage
     }
 };
 
 const rootReducer = combineReducers({
-    getAllPizzasReducer,
-    cartReducer,
+    pizzaReducer,
+    authReducer,
+    cartReducer
 });
 
 const middleware = [thunk];
@@ -31,7 +37,7 @@ const middleware = [thunk];
 const store = createStore(
     rootReducer,
     initialState,
-    composeWithDevTools(applyMiddleware(...middleware))
+    applyMiddleware(...middleware)
 );
 
 export default store;

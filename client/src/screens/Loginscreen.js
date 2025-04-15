@@ -1,82 +1,113 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { Form, Alert, Button } from 'react-bootstrap';
+import '../styles/Auth.css';
 
-export default function Loginscreen() {
-  let navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const Loginscreen = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { login, isAdmin } = useAuth();
+    const [formData, setFormData] = useState({
+        email: '',
+        password: '',
+        rememberMe: false
+    });
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-  const LoginUser = async (e) => {
-    e.preventDefault(); // Prevent default form submission
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
+    };
 
-    try {
-      const response = await axios.post("/api/auth/login", { email, password });
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
 
-      // Store token in localStorage
-      localStorage.setItem("token", response.data.token);
-      console.log("Login Successful, Token:", response.data.token);
-
-      alert("Login Successful!");
-      navigate('/');
-
-    } catch (error) {
-      console.error("Login error:", error.response?.data?.message || "Something went wrong");
-      alert(error.response?.data?.message || "Invalid Email or Password");
+        try {
+            await login(formData.email, formData.password);
+            
+            // Check if user is admin and redirect accordingly
+            if (isAdmin()) {
+                navigate('/dashboard');
+            } else {
+                // Redirect to the attempted page or home
+                const from = location.state?.from?.pathname || '/';
+                navigate(from);
+            }
+        } catch (err) {
+            setError(err.message || 'Failed to log in');
+        } finally {
+            setLoading(false);
     }
   };
 
   return (
-    <div className="container" style={{ backgroundColor: 'transparent' }}>
-      <div className="row">
-        <div className="col-sm-9 col-md-7 col-lg-5 mx-auto">
-          <div className="card border-0 shadow rounded-3 my-5">
-            <div className="card-body p-4 p-sm-5">
-              <h5 className="card-title text-center mb-5 fw-light fs-5">Log In</h5>
-              <form onSubmit={LoginUser}> 
-                <div className="form-floating mb-3">
-                  <input
-                    type="email"
-                    className="form-control"
-                    id="floatingInput"
-                    autoComplete="off"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                  <label htmlFor="floatingInput">Email address</label>
+        <div className="auth-wrapper">
+            <div className="auth-left">
+                <div className="auth-overlay">
+                    <div className="auth-content">
+                        <h1>Welcome to PizzaHub</h1>
+                        <p>Experience the best pizza delivery service in town. Order your favorite pizzas with just a few clicks.</p>
+                    </div>
                 </div>
-                <div className="form-floating mb-3">
-                  <input
-                    type="password"
-                    autoComplete="off"
-                    className="form-control"
-                    id="floatingPassword"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                  <label htmlFor="floatingPassword">Password</label>
-                </div>
-
-                <div className="d-grid">
-                  <button className="btn btn-primary btn-login text-uppercase fw-bold" type="submit">
-                    Sign in
-                  </button>
-                </div>
-                <hr className="my-4" />
-                <div className="d-grid">
-                  <b>Don't have an account?  
-                    <button className="btn btn-link fw-bold" type="button" onClick={() => navigate("/Registerscreen")}>
-                      Register Now
-                    </button>
-                  </b>
-                </div>
-              </form>
             </div>
-          </div>
+            <div className="auth-right">
+                <div className="auth-form-container">
+                    <h2 className="text-center mb-4">Login</h2>
+                    {error && <Alert variant="danger">{error}</Alert>}
+                    <Form onSubmit={handleSubmit}>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Email</Form.Label>
+                            <Form.Control
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                required
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Password</Form.Label>
+                            <Form.Control
+                    type="password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                    required
+                  />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Check
+                                type="checkbox"
+                                name="rememberMe"
+                                label="Remember me"
+                                checked={formData.rememberMe}
+                                onChange={handleChange}
+                            />
+                        </Form.Group>
+                        <div className="d-grid">
+                            <Button 
+                                variant="primary" 
+                                type="submit" 
+                                disabled={loading}
+                            >
+                                {loading ? 'Logging in...' : 'Login'}
+                            </Button>
+                </div>
+                    </Form>
+                    <div className="text-center mt-3">
+                        <p>Don't have an account? <Link to="/register">Register here</Link></p>
+                </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default Loginscreen;
