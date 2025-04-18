@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Pizza = require('../models/pizzaModel');
-const { authenticate, isAdmin } = require('../middleware/authMiddleware');
+const { authenticate, isAdmin } = require('../middleware/authenticate');
 
 // Get all pizzas (Public route)
 router.get('/', async (req, res) => {

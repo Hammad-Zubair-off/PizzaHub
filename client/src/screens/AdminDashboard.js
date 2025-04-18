@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Container, Row, Col, Card, Button, Form, Table, Alert, Modal } from 'react-bootstrap';
-import { fetchPizzas, addPizza, updatePizza, deletePizza } from '../actions/pizzaActions';
+import { Container, Row, Col, Card, Button, Form, Table, Alert, Modal, Badge } from 'react-bootstrap';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../components/Loader';
+import { useAuth } from '../context/AuthContext';
 
 const AdminDashboard = () => {
-    const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { pizzas, loading, error } = useSelector(state => state.pizzaReducer);
+    const { isAdmin } = useAuth();
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [pizzas, setPizzas] = useState([]);
+    const [orders, setOrders] = useState([]);
+    const [users, setUsers] = useState([]);
+    const [activeTab, setActiveTab] = useState('pizzas');
 
     // State for pizza form
     const [showAddModal, setShowAddModal] = useState(false);
@@ -35,20 +40,39 @@ const AdminDashboard = () => {
     });
     const [formError, setFormError] = useState('');
 
+    // Fetch data on component mount
     useEffect(() => {
-        dispatch(fetchPizzas());
-    }, [dispatch]);
+        if (!isAdmin()) {
+            navigate('/admin/login');
+            return;
+        }
+        fetchData();
+    }, [isAdmin, navigate]);
 
-    const handleManageProducts = () => {
-        navigate('/admin/products');
-    };
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            const token = localStorage.getItem('token');
+            const headers = { Authorization: `Bearer ${token}` };
 
-    const handleManageOrders = () => {
-        navigate('/admin/orders');
-    };
+            // Fetch pizzas
+            const pizzasResponse = await axios.get('/api/pizzas', { headers });
+            setPizzas(pizzasResponse.data);
 
-    const handleManageUsers = () => {
-        navigate('/admin/users');
+            // Fetch orders
+            const ordersResponse = await axios.get('/api/orders/all', { headers });
+            setOrders(ordersResponse.data.orders);
+
+            // Fetch users
+            const usersResponse = await axios.get('/api/auth/users', { headers });
+            setUsers(usersResponse.data.users);
+
+            setLoading(false);
+        } catch (err) {
+            console.error('Error fetching data:', err);
+            setError(err.response?.data?.message || 'Failed to fetch data');
+            setLoading(false);
+        }
     };
 
     // Handle form input changes
@@ -98,37 +122,114 @@ const AdminDashboard = () => {
         });
     };
 
-    // Handle form submission
-    const handleSubmit = (e) => {
+    // Handle form submission for adding new pizza
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setFormError('');
 
-        // Validate form
-        if (!formData.name || !formData.image || !formData.description) {
-            setFormError('Please fill in all required fields');
-            return;
+        try {
+            // Validate form
+            if (!formData.name || !formData.image || !formData.description) {
+                setFormError('Please fill in all required fields');
+                return;
+            }
+
+            // Filter out empty ingredients
+            const filteredIngredients = formData.ingredients.filter(ing => ing.trim() !== '');
+            
+            if (filteredIngredients.length === 0) {
+                setFormError('Please add at least one ingredient');
+                return;
+            }
+
+            // Prepare pizza data
+            const pizzaData = {
+                ...formData,
+                ingredients: filteredIngredients
+            };
+
+            const token = localStorage.getItem('token');
+            const headers = { Authorization: `Bearer ${token}` };
+
+            // Add new pizza
+            await axios.post('/api/pizzas', pizzaData, { headers });
+            
+            // Refresh pizzas list
+            const response = await axios.get('/api/pizzas', { headers });
+            setPizzas(response.data);
+            
+            // Close modal and reset form
+            setShowAddModal(false);
+            resetForm();
+        } catch (err) {
+            console.error('Error adding pizza:', err);
+            setFormError(err.response?.data?.message || 'Failed to add pizza');
         }
+    };
 
-        // Filter out empty ingredients
-        const filteredIngredients = formData.ingredients.filter(ing => ing.trim() !== '');
-        
-        if (filteredIngredients.length === 0) {
-            setFormError('Please add at least one ingredient');
-            return;
+    // Handle pizza update
+    const handleUpdate = async (e) => {
+        e.preventDefault();
+        setFormError('');
+
+        try {
+            // Validate form
+            if (!formData.name || !formData.image || !formData.description) {
+                setFormError('Please fill in all required fields');
+                return;
+            }
+
+            // Filter out empty ingredients
+            const filteredIngredients = formData.ingredients.filter(ing => ing.trim() !== '');
+            
+            if (filteredIngredients.length === 0) {
+                setFormError('Please add at least one ingredient');
+                return;
+            }
+
+            // Prepare pizza data
+            const pizzaData = {
+                ...formData,
+                ingredients: filteredIngredients
+            };
+
+            const token = localStorage.getItem('token');
+            const headers = { Authorization: `Bearer ${token}` };
+
+            // Update pizza
+            await axios.put(`/api/pizzas/${currentPizza._id}`, pizzaData, { headers });
+            
+            // Refresh pizzas list
+            const response = await axios.get('/api/pizzas', { headers });
+            setPizzas(response.data);
+            
+            // Close modal and reset form
+            setShowEditModal(false);
+            resetForm();
+        } catch (err) {
+            console.error('Error updating pizza:', err);
+            setFormError(err.response?.data?.message || 'Failed to update pizza');
         }
+    };
 
-        // Prepare pizza data
-        const pizzaData = {
-            ...formData,
-            ingredients: filteredIngredients
-        };
+    // Handle pizza deletion
+    const handleDelete = async (id) => {
+        if (window.confirm('Are you sure you want to delete this pizza?')) {
+            try {
+                const token = localStorage.getItem('token');
+                const headers = { Authorization: `Bearer ${token}` };
 
-        // Dispatch action to add pizza
-        dispatch(addPizza(pizzaData));
-        
-        // Close modal and reset form
-        setShowAddModal(false);
-        resetForm();
+                // Delete pizza
+                await axios.delete(`/api/pizzas/${id}`, { headers });
+                
+                // Refresh pizzas list
+                const response = await axios.get('/api/pizzas', { headers });
+                setPizzas(response.data);
+            } catch (err) {
+                console.error('Error deleting pizza:', err);
+                setError(err.response?.data?.message || 'Failed to delete pizza');
+            }
+        }
     };
 
     // Handle edit pizza
@@ -152,43 +253,20 @@ const AdminDashboard = () => {
         setShowEditModal(true);
     };
 
-    // Handle update pizza
-    const handleUpdate = (e) => {
-        e.preventDefault();
-        setFormError('');
+    // Handle order status update
+    const handleOrderStatusUpdate = async (orderId, status) => {
+        try {
+            const token = localStorage.getItem('token');
+            const headers = { Authorization: `Bearer ${token}` };
 
-        // Validate form
-        if (!formData.name || !formData.image || !formData.description) {
-            setFormError('Please fill in all required fields');
-            return;
-        }
-
-        // Filter out empty ingredients
-        const filteredIngredients = formData.ingredients.filter(ing => ing.trim() !== '');
-        
-        if (filteredIngredients.length === 0) {
-            setFormError('Please add at least one ingredient');
-            return;
-        }
-
-        // Prepare pizza data
-        const pizzaData = {
-            ...formData,
-            ingredients: filteredIngredients
-        };
-
-        // Dispatch action to update pizza
-        dispatch(updatePizza(currentPizza._id, pizzaData));
-        
-        // Close modal and reset form
-        setShowEditModal(false);
-        resetForm();
-    };
-
-    // Handle delete pizza
-    const handleDelete = (id) => {
-        if (window.confirm('Are you sure you want to delete this pizza?')) {
-            dispatch(deletePizza(id));
+            await axios.put(`/api/orders/${orderId}/status`, { status }, { headers });
+            
+            // Refresh orders list
+            const response = await axios.get('/api/orders/all', { headers });
+            setOrders(response.data.orders);
+        } catch (err) {
+            console.error('Error updating order status:', err);
+            setError(err.response?.data?.message || 'Failed to update order status');
         }
     };
 
@@ -217,126 +295,185 @@ const AdminDashboard = () => {
     };
 
     if (loading) return <Loader />;
-    if (error) return <div className="alert alert-danger">{error}</div>;
+    if (error) return <Alert variant="danger">{error}</Alert>;
 
     return (
-        <Container className="py-5">
-            <h2 className="mb-4">Admin Dashboard</h2>
-            <Row>
-                <Col md={4} className="mb-4">
-                    <Card>
-                        <Card.Body>
-                            <Card.Title>Products</Card.Title>
-                            <Card.Text>
-                                Manage your pizza menu ({pizzas?.length || 0} pizzas)
-                            </Card.Text>
-                            <Button variant="primary" onClick={handleManageProducts}>
-                                Manage Products
-                            </Button>
-                        </Card.Body>
-                    </Card>
-                </Col>
-                <Col md={4} className="mb-4">
-                    <Card>
-                        <Card.Body>
-                            <Card.Title>Orders</Card.Title>
-                            <Card.Text>
-                                View and manage customer orders
-                            </Card.Text>
-                            <Button variant="primary" onClick={handleManageOrders}>
-                                Manage Orders
-                            </Button>
-                        </Card.Body>
-                    </Card>
-                </Col>
-                <Col md={4} className="mb-4">
-                    <Card>
-                        <Card.Body>
-                            <Card.Title>Users</Card.Title>
-                            <Card.Text>
-                                Manage user accounts and permissions
-                            </Card.Text>
-                            <Button variant="primary" onClick={handleManageUsers}>
-                                Manage Users
-                            </Button>
-                        </Card.Body>
-                    </Card>
-                </Col>
-            </Row>
-
-            <Row className="mt-4">
+        <Container fluid className="py-3">
+            <Row className="mb-4">
                 <Col>
-                    {error && <Alert variant="danger">{error}</Alert>}
-
-                    {loading ? (
-                        <Loader />
-                    ) : (
-                        <Card>
-                            <Card.Body>
-                                <div className="d-flex justify-content-between align-items-center mb-3">
-                                    <h4 className="mb-0">Pizzas</h4>
-                                    <Button 
-                                        variant="success" 
-                                        onClick={() => setShowAddModal(true)}
-                                    >
-                                        Add New Pizza
-                                    </Button>
-                                </div>
-                                <Table responsive striped hover>
-                                    <thead>
-                                        <tr>
-                                            <th>Image</th>
-                                            <th>Name</th>
-                                            <th>Category</th>
-                                            <th>Price (Small)</th>
-                                            <th>Status</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {pizzas.map(pizza => (
-                                            <tr key={pizza._id}>
-                                                <td>
-                                                    <img 
-                                                        src={pizza.image} 
-                                                        alt={pizza.name} 
-                                                        style={{ width: '50px', height: '50px', objectFit: 'cover' }} 
-                                                    />
-                                                </td>
-                                                <td>{pizza.name}</td>
-                                                <td>{pizza.category}</td>
-                                                <td>${pizza.prices.find(p => p.varient === 'small')?.price || 0}</td>
-                                                <td>
-                                                    <span className={`badge ${pizza.isAvailable ? 'bg-success' : 'bg-danger'}`}>
-                                                        {pizza.isAvailable ? 'Available' : 'Unavailable'}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <Button 
-                                                        variant="outline-primary" 
-                                                        size="sm" 
-                                                        className="me-2"
-                                                        onClick={() => handleEdit(pizza)}
-                                                    >
-                                                        Edit
-                                                    </Button>
-                                                    <Button 
-                                                        variant="outline-danger" 
-                                                        size="sm"
-                                                        onClick={() => handleDelete(pizza._id)}
-                                                    >
-                                                        Delete
-                                                    </Button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </Table>
-                            </Card.Body>
-                        </Card>
-                    )}
+                    <h2>Admin Dashboard</h2>
                 </Col>
             </Row>
+
+            <Row className="mb-4">
+                <Col>
+                    <Button 
+                        variant={activeTab === 'pizzas' ? 'primary' : 'outline-primary'} 
+                        onClick={() => setActiveTab('pizzas')}
+                        className="me-2"
+                    >
+                        Manage Pizzas
+                    </Button>
+                    <Button 
+                        variant={activeTab === 'orders' ? 'primary' : 'outline-primary'} 
+                        onClick={() => setActiveTab('orders')}
+                        className="me-2"
+                    >
+                        Manage Orders
+                    </Button>
+                    <Button 
+                        variant={activeTab === 'users' ? 'primary' : 'outline-primary'} 
+                        onClick={() => setActiveTab('users')}
+                    >
+                        Manage Users
+                    </Button>
+                </Col>
+            </Row>
+
+            {/* Pizzas Management */}
+            {activeTab === 'pizzas' && (
+                <>
+                    <Row className="mb-3">
+                        <Col>
+                            <Button variant="success" onClick={() => setShowAddModal(true)}>
+                                Add New Pizza
+                            </Button>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <Table responsive striped bordered hover>
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Category</th>
+                                        <th>Price (Small)</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {pizzas.map(pizza => (
+                                        <tr key={pizza._id}>
+                                            <td>{pizza.name}</td>
+                                            <td>{pizza.category}</td>
+                                            <td>Rs. {pizza.prices[0].price}</td>
+                                            <td>
+                                                <Badge bg={pizza.isAvailable ? 'success' : 'danger'}>
+                                                    {pizza.isAvailable ? 'Available' : 'Not Available'}
+                                                </Badge>
+                                            </td>
+                                            <td>
+                                                <Button 
+                                                    variant="info" 
+                                                    size="sm" 
+                                                    className="me-2"
+                                                    onClick={() => handleEdit(pizza)}
+                                                >
+                                                    Edit
+                                                </Button>
+                                                <Button 
+                                                    variant="danger" 
+                                                    size="sm"
+                                                    onClick={() => handleDelete(pizza._id)}
+                                                >
+                                                    Delete
+                                                </Button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </Table>
+                        </Col>
+                    </Row>
+                </>
+            )}
+
+            {/* Orders Management */}
+            {activeTab === 'orders' && (
+                <Row>
+                    <Col>
+                        <Table responsive striped bordered hover>
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Total Amount</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {orders.map(order => (
+                                    <tr key={order._id}>
+                                        <td>{order._id.slice(-6)}</td>
+                                        <td>{order.user?.name || 'Guest'}</td>
+                                        <td>Rs. {order.totalAmount.toFixed(2)}</td>
+                                        <td>
+                                            <Badge bg={
+                                                order.status === 'pending' ? 'warning' :
+                                                order.status === 'confirmed' ? 'info' :
+                                                order.status === 'preparing' ? 'primary' :
+                                                order.status === 'out_for_delivery' ? 'info' :
+                                                order.status === 'delivered' ? 'success' :
+                                                'danger'
+                                            }>
+                                                {order.status.replace(/_/g, ' ').toUpperCase()}
+                                            </Badge>
+                                        </td>
+                                        <td>
+                                            <Form.Select 
+                                                size="sm" 
+                                                value={order.status}
+                                                onChange={(e) => handleOrderStatusUpdate(order._id, e.target.value)}
+                                            >
+                                                <option value="pending">Pending</option>
+                                                <option value="confirmed">Confirmed</option>
+                                                <option value="preparing">Preparing</option>
+                                                <option value="out_for_delivery">Out for Delivery</option>
+                                                <option value="delivered">Delivered</option>
+                                                <option value="cancelled">Cancelled</option>
+                                            </Form.Select>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
+                    </Col>
+                </Row>
+            )}
+
+            {/* Users Management */}
+            {activeTab === 'users' && (
+                <Row>
+                    <Col>
+                        <Table responsive striped bordered hover>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Joined Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {users.map(user => (
+                                    <tr key={user._id}>
+                                        <td>{user.name}</td>
+                                        <td>{user.email}</td>
+                                        <td>
+                                            <Badge bg={user.role === 'admin' ? 'danger' : 'info'}>
+                                                {user.role.toUpperCase()}
+                                            </Badge>
+                                        </td>
+                                        <td>{new Date(user.createdAt).toLocaleDateString()}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
+                    </Col>
+                </Row>
+            )}
 
             {/* Add Pizza Modal */}
             <Modal show={showAddModal} onHide={() => setShowAddModal(false)} size="lg">
@@ -344,150 +481,113 @@ const AdminDashboard = () => {
                     <Modal.Title>Add New Pizza</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {formError && <Alert variant="danger">{formError}</Alert>}
                     <Form onSubmit={handleSubmit}>
-                        <Row>
-                            <Col md={6}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Name *</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        name="name"
-                                        value={formData.name}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </Form.Group>
-                            </Col>
-                            <Col md={6}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Category *</Form.Label>
-                                    <Form.Select
-                                        name="category"
-                                        value={formData.category}
-                                        onChange={handleInputChange}
-                                        required
-                                    >
-                                        <option value="Veg">Vegetarian</option>
-                                        <option value="Non-Veg">Non-Vegetarian</option>
-                                    </Form.Select>
-                                </Form.Group>
-                            </Col>
-                        </Row>
-
-                        <Row>
-                            <Col md={6}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Image URL *</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        name="image"
-                                        value={formData.image}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </Form.Group>
-                            </Col>
-                            <Col md={6}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Description *</Form.Label>
-                                    <Form.Control
-                                        as="textarea"
-                                        rows={2}
-                                        name="description"
-                                        value={formData.description}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </Form.Group>
-                            </Col>
-                        </Row>
-
-                        <Row>
-                            <Col md={6}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Cooking Time (minutes) *</Form.Label>
-                                    <Form.Control
-                                        type="number"
-                                        name="cookingTime"
-                                        value={formData.cookingTime}
-                                        onChange={handleInputChange}
-                                        min="1"
-                                        required
-                                    />
-                                </Form.Group>
-                            </Col>
-                            <Col md={6}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Spice Level (1-5) *</Form.Label>
-                                    <Form.Control
-                                        type="number"
-                                        name="spiceLevel"
-                                        value={formData.spiceLevel}
-                                        onChange={handleInputChange}
-                                        min="1"
-                                        max="5"
-                                        required
-                                    />
-                                </Form.Group>
-                            </Col>
-                        </Row>
-
+                        {formError && <Alert variant="danger">{formError}</Alert>}
+                        
                         <Form.Group className="mb-3">
-                            <Form.Label>Prices *</Form.Label>
-                            <Row>
-                                {formData.prices.map((price, index) => (
-                                    <Col md={4} key={index}>
-                                        <Form.Group className="mb-2">
-                                            <Form.Label>
-                                                {price.varient ? 
-                                                    price.varient.charAt(0).toUpperCase() + price.varient.slice(1) : 
-                                                    'Price'}
-                                            </Form.Label>
-                                            <Form.Control
-                                                type="number"
-                                                value={price.price}
-                                                onChange={(e) => handlePriceChange(index, e.target.value)}
-                                                min="0"
-                                                required
-                                            />
-                                        </Form.Group>
-                                    </Col>
-                                ))}
-                            </Row>
+                            <Form.Label>Name</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleInputChange}
+                                required
+                            />
                         </Form.Group>
 
                         <Form.Group className="mb-3">
-                            <Form.Label>Ingredients *</Form.Label>
-                            {formData.ingredients.map((ingredient, index) => (
-                                <Row key={index} className="mb-2">
-                                    <Col>
-                                        <Form.Control
-                                            type="text"
-                                            value={ingredient}
-                                            onChange={(e) => handleIngredientChange(index, e.target.value)}
-                                            placeholder={`Ingredient ${index + 1}`}
-                                        />
-                                    </Col>
-                                    <Col xs="auto">
-                                        <Button 
-                                            variant="outline-danger" 
-                                            size="sm"
-                                            onClick={() => removeIngredientField(index)}
-                                        >
-                                            Remove
-                                        </Button>
-                                    </Col>
-                                </Row>
-                            ))}
-                            <Button 
-                                variant="outline-secondary" 
-                                size="sm" 
-                                onClick={addIngredientField}
-                                className="mt-2"
+                            <Form.Label>Category</Form.Label>
+                            <Form.Select
+                                name="category"
+                                value={formData.category}
+                                onChange={handleInputChange}
                             >
+                                <option value="Veg">Veg</option>
+                                <option value="Non-Veg">Non-Veg</option>
+                            </Form.Select>
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>Prices</Form.Label>
+                            {formData.prices.map((price, index) => (
+                                <div key={price.varient} className="d-flex mb-2">
+                                    <Form.Label className="me-2 w-25">{price.varient}</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        value={price.price}
+                                        onChange={(e) => handlePriceChange(index, e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            ))}
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>Image URL</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="image"
+                                value={formData.image}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>Description</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                name="description"
+                                value={formData.description}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>Ingredients</Form.Label>
+                            {formData.ingredients.map((ingredient, index) => (
+                                <div key={index} className="d-flex mb-2">
+                                    <Form.Control
+                                        type="text"
+                                        value={ingredient}
+                                        onChange={(e) => handleIngredientChange(index, e.target.value)}
+                                        className="me-2"
+                                    />
+                                    <Button
+                                        variant="danger"
+                                        onClick={() => removeIngredientField(index)}
+                                        disabled={formData.ingredients.length === 1}
+                                    >
+                                        Remove
+                                    </Button>
+                                </div>
+                            ))}
+                            <Button variant="secondary" onClick={addIngredientField}>
                                 Add Ingredient
                             </Button>
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>Cooking Time (minutes)</Form.Label>
+                            <Form.Control
+                                type="number"
+                                name="cookingTime"
+                                value={formData.cookingTime}
+                                onChange={handleInputChange}
+                            />
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>Spice Level (1-5)</Form.Label>
+                            <Form.Control
+                                type="number"
+                                name="spiceLevel"
+                                value={formData.spiceLevel}
+                                onChange={handleInputChange}
+                                min="1"
+                                max="5"
+                            />
                         </Form.Group>
 
                         <Form.Group className="mb-3">
@@ -500,14 +600,9 @@ const AdminDashboard = () => {
                             />
                         </Form.Group>
 
-                        <div className="d-grid gap-2">
-                            <Button variant="primary" type="submit">
-                                Add Pizza
-                            </Button>
-                            <Button variant="outline-secondary" onClick={() => setShowAddModal(false)}>
-                                Cancel
-                            </Button>
-                        </div>
+                        <Button variant="primary" type="submit">
+                            Add Pizza
+                        </Button>
                     </Form>
                 </Modal.Body>
             </Modal>
@@ -518,150 +613,113 @@ const AdminDashboard = () => {
                     <Modal.Title>Edit Pizza</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {formError && <Alert variant="danger">{formError}</Alert>}
                     <Form onSubmit={handleUpdate}>
-                        <Row>
-                            <Col md={6}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Name *</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        name="name"
-                                        value={formData.name}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </Form.Group>
-                            </Col>
-                            <Col md={6}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Category *</Form.Label>
-                                    <Form.Select
-                                        name="category"
-                                        value={formData.category}
-                                        onChange={handleInputChange}
-                                        required
-                                    >
-                                        <option value="Veg">Vegetarian</option>
-                                        <option value="Non-Veg">Non-Vegetarian</option>
-                                    </Form.Select>
-                                </Form.Group>
-                            </Col>
-                        </Row>
-
-                        <Row>
-                            <Col md={6}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Image URL *</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        name="image"
-                                        value={formData.image}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </Form.Group>
-                            </Col>
-                            <Col md={6}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Description *</Form.Label>
-                                    <Form.Control
-                                        as="textarea"
-                                        rows={2}
-                                        name="description"
-                                        value={formData.description}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </Form.Group>
-                            </Col>
-                        </Row>
-
-                        <Row>
-                            <Col md={6}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Cooking Time (minutes) *</Form.Label>
-                                    <Form.Control
-                                        type="number"
-                                        name="cookingTime"
-                                        value={formData.cookingTime}
-                                        onChange={handleInputChange}
-                                        min="1"
-                                        required
-                                    />
-                                </Form.Group>
-                            </Col>
-                            <Col md={6}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Spice Level (1-5) *</Form.Label>
-                                    <Form.Control
-                                        type="number"
-                                        name="spiceLevel"
-                                        value={formData.spiceLevel}
-                                        onChange={handleInputChange}
-                                        min="1"
-                                        max="5"
-                                        required
-                                    />
-                                </Form.Group>
-                            </Col>
-                        </Row>
-
+                        {formError && <Alert variant="danger">{formError}</Alert>}
+                        
                         <Form.Group className="mb-3">
-                            <Form.Label>Prices *</Form.Label>
-                            <Row>
-                                {formData.prices.map((price, index) => (
-                                    <Col md={4} key={index}>
-                                        <Form.Group className="mb-2">
-                                            <Form.Label>
-                                                {price.varient ? 
-                                                    price.varient.charAt(0).toUpperCase() + price.varient.slice(1) : 
-                                                    'Price'}
-                                            </Form.Label>
-                                            <Form.Control
-                                                type="number"
-                                                value={price.price}
-                                                onChange={(e) => handlePriceChange(index, e.target.value)}
-                                                min="0"
-                                                required
-                                            />
-                                        </Form.Group>
-                                    </Col>
-                                ))}
-                            </Row>
+                            <Form.Label>Name</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleInputChange}
+                                required
+                            />
                         </Form.Group>
 
                         <Form.Group className="mb-3">
-                            <Form.Label>Ingredients *</Form.Label>
-                            {formData.ingredients.map((ingredient, index) => (
-                                <Row key={index} className="mb-2">
-                                    <Col>
-                                        <Form.Control
-                                            type="text"
-                                            value={ingredient}
-                                            onChange={(e) => handleIngredientChange(index, e.target.value)}
-                                            placeholder={`Ingredient ${index + 1}`}
-                                        />
-                                    </Col>
-                                    <Col xs="auto">
-                                        <Button 
-                                            variant="outline-danger" 
-                                            size="sm"
-                                            onClick={() => removeIngredientField(index)}
-                                        >
-                                            Remove
-                                        </Button>
-                                    </Col>
-                                </Row>
-                            ))}
-                            <Button 
-                                variant="outline-secondary" 
-                                size="sm" 
-                                onClick={addIngredientField}
-                                className="mt-2"
+                            <Form.Label>Category</Form.Label>
+                            <Form.Select
+                                name="category"
+                                value={formData.category}
+                                onChange={handleInputChange}
                             >
+                                <option value="Veg">Veg</option>
+                                <option value="Non-Veg">Non-Veg</option>
+                            </Form.Select>
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>Prices</Form.Label>
+                            {formData.prices.map((price, index) => (
+                                <div key={price.varient} className="d-flex mb-2">
+                                    <Form.Label className="me-2 w-25">{price.varient}</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        value={price.price}
+                                        onChange={(e) => handlePriceChange(index, e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            ))}
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>Image URL</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="image"
+                                value={formData.image}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>Description</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                name="description"
+                                value={formData.description}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>Ingredients</Form.Label>
+                            {formData.ingredients.map((ingredient, index) => (
+                                <div key={index} className="d-flex mb-2">
+                                    <Form.Control
+                                        type="text"
+                                        value={ingredient}
+                                        onChange={(e) => handleIngredientChange(index, e.target.value)}
+                                        className="me-2"
+                                    />
+                                    <Button
+                                        variant="danger"
+                                        onClick={() => removeIngredientField(index)}
+                                        disabled={formData.ingredients.length === 1}
+                                    >
+                                        Remove
+                                    </Button>
+                                </div>
+                            ))}
+                            <Button variant="secondary" onClick={addIngredientField}>
                                 Add Ingredient
                             </Button>
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>Cooking Time (minutes)</Form.Label>
+                            <Form.Control
+                                type="number"
+                                name="cookingTime"
+                                value={formData.cookingTime}
+                                onChange={handleInputChange}
+                            />
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>Spice Level (1-5)</Form.Label>
+                            <Form.Control
+                                type="number"
+                                name="spiceLevel"
+                                value={formData.spiceLevel}
+                                onChange={handleInputChange}
+                                min="1"
+                                max="5"
+                            />
                         </Form.Group>
 
                         <Form.Group className="mb-3">
@@ -674,14 +732,9 @@ const AdminDashboard = () => {
                             />
                         </Form.Group>
 
-                        <div className="d-grid gap-2">
-                            <Button variant="primary" type="submit">
-                                Update Pizza
-                            </Button>
-                            <Button variant="outline-secondary" onClick={() => setShowEditModal(false)}>
-                                Cancel
-                            </Button>
-                        </div>
+                        <Button variant="primary" type="submit">
+                            Update Pizza
+                        </Button>
                     </Form>
                 </Modal.Body>
             </Modal>
