@@ -7,7 +7,7 @@ import ProceedToCheckout from '../components/ProceedToCheckout';
 
 const CartScreen = () => {
     const dispatch = useDispatch();
-    
+
     // Update the selector to use cartReducer instead of cart
     const cart = useSelector((state) => state.cartReducer || { cartItems: [] });
     const { cartItems = [] } = cart;

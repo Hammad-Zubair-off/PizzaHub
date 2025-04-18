@@ -19,6 +19,9 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import AdminLogin from './screens/AdminLogin';
 import { ToastContainer } from 'react-toastify';
+import MenuScreen from './screens/MenuScreen';
+import SuccessScreen from './screens/SuccessScreen';
+import OrdersScreen from './screens/OrdersScreen';
 
 function App() {
   return (
@@ -29,15 +32,18 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route path='/' element={<Homescreen/>} />
+          <Route path='/menu' element={<MenuScreen/>} />
           <Route path='/about' element={<About/>} />
           <Route path='/login' element={<Loginscreen/>} />
           <Route path='/register' element={<Registerscreen/>} />
           <Route path='/admin/login' element={<AdminLogin/>} />
+          <Route path='/success' element={<SuccessScreen/>} />
+          <Route path='/cart' element={<Cartscreen/>} />
+          <Route path='/orders' element={<OrdersScreen/>} />
           
           {/* Protected User Routes */}
           <Route element={<ProtectedRoute />}>
             <Route path='/profile' element={<ProfileScreen/>} />
-            <Route path='/cart' element={<Cartscreen/>} />
           </Route>
           
           {/* Protected Admin Routes */}

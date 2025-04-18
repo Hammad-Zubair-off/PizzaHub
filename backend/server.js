@@ -30,6 +30,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSetup));
 const pizzasRoute = require('./routes/pizzasRoute');
 const authRoutes = require('./routes/authRoutes');
 const orderRoutes = require('./routes/orderRoutes');
+const stripeRoutes = require('./routes/stripe');
 
 // Test endpoint
 app.get('/api/test', (req, res) => {
@@ -39,6 +40,7 @@ app.get('/api/test', (req, res) => {
 app.use("/api/pizzas", pizzasRoute);
 app.use("/api/auth", authRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/stripe", stripeRoutes);
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
