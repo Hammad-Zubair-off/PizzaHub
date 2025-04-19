@@ -40,7 +40,8 @@ router.post('/create-checkout-session', async (req, res) => {
         currency: 'pkr', // Using PKR (Pakistani Rupee) as currency
         product_data: {
           name: item.name,
-          images: [item.image], // Add product image
+          // Only include image if it's a valid URL and not too long
+          ...(item.image && item.image.length < 2048 ? { images: [item.image] } : {}),
           description: `Size: ${item.variant}`,
         },
         unit_amount: Math.round(item.price * 100), // Convert to smallest currency unit (paise)

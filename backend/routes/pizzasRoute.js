@@ -7,6 +7,7 @@ const { authenticate, isAdmin } = require('../middleware/authenticate');
 router.get('/', async (req, res) => {
     try {
         console.log('Fetching pizzas...');
+        console.log('Request query:', req.query);
         const { category, sort } = req.query;
         let query = {};
 

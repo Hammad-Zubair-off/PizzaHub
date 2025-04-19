@@ -91,7 +91,7 @@ const Loginscreen = () => {
                                 onChange={handleChange}
                             />
                         </Form.Group>
-                        <div className="d-grid">
+                <div className="d-grid">
                             <Button 
                                 variant="primary" 
                                 type="submit" 
@@ -103,7 +103,7 @@ const Loginscreen = () => {
                     </Form>
                     <div className="text-center mt-3">
                         <p>Don't have an account? <Link to="/register">Register here</Link></p>
-                </div>
+          </div>
         </div>
       </div>
     </div>

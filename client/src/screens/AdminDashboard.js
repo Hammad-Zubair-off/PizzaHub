@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../components/Loader';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-hot-toast';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -52,8 +53,19 @@ const AdminDashboard = () => {
     const fetchData = async () => {
         try {
             setLoading(true);
+            setError(null);
             const token = localStorage.getItem('token');
-            const headers = { Authorization: `Bearer ${token}` };
+            
+            if (!token) {
+                setError('No authentication token found. Please login again.');
+                navigate('/admin/login');
+                return;
+            }
+
+            const headers = { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
 
             // Fetch pizzas
             const pizzasResponse = await axios.get('/api/pizzas', { headers });
@@ -70,8 +82,14 @@ const AdminDashboard = () => {
             setLoading(false);
         } catch (err) {
             console.error('Error fetching data:', err);
-            setError(err.response?.data?.message || 'Failed to fetch data');
+            const errorMessage = err.response?.data?.message || 'Failed to fetch data';
+            setError(errorMessage);
             setLoading(false);
+
+            // If unauthorized, redirect to login
+            if (err.response?.status === 401) {
+                navigate('/admin/login');
+            }
         }
     };
 
@@ -149,21 +167,39 @@ const AdminDashboard = () => {
             };
 
             const token = localStorage.getItem('token');
-            const headers = { Authorization: `Bearer ${token}` };
+            if (!token) {
+                setFormError('No authentication token found. Please login again.');
+                navigate('/admin/login');
+                return;
+            }
+
+            const headers = { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
 
             // Add new pizza
-            await axios.post('/api/pizzas', pizzaData, { headers });
+            const response = await axios.post('/api/pizzas', pizzaData, { headers });
             
-            // Refresh pizzas list
-            const response = await axios.get('/api/pizzas', { headers });
-            setPizzas(response.data);
-            
-            // Close modal and reset form
-            setShowAddModal(false);
-            resetForm();
+            if (response.data) {
+                // Refresh pizzas list
+                const pizzasResponse = await axios.get('/api/pizzas', { headers });
+                setPizzas(pizzasResponse.data);
+                
+                // Close modal and reset form
+                setShowAddModal(false);
+                resetForm();
+                toast.success('Pizza added successfully!');
+            }
         } catch (err) {
             console.error('Error adding pizza:', err);
-            setFormError(err.response?.data?.message || 'Failed to add pizza');
+            const errorMessage = err.response?.data?.message || 'Failed to add pizza';
+            setFormError(errorMessage);
+
+            // If unauthorized, redirect to login
+            if (err.response?.status === 401) {
+                navigate('/admin/login');
+            }
         }
     };
 
@@ -194,21 +230,39 @@ const AdminDashboard = () => {
             };
 
             const token = localStorage.getItem('token');
-            const headers = { Authorization: `Bearer ${token}` };
+            if (!token) {
+                setFormError('No authentication token found. Please login again.');
+                navigate('/admin/login');
+                return;
+            }
+
+            const headers = { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
 
             // Update pizza
-            await axios.put(`/api/pizzas/${currentPizza._id}`, pizzaData, { headers });
+            const response = await axios.put(`/api/pizzas/${currentPizza._id}`, pizzaData, { headers });
             
-            // Refresh pizzas list
-            const response = await axios.get('/api/pizzas', { headers });
-            setPizzas(response.data);
-            
-            // Close modal and reset form
-            setShowEditModal(false);
-            resetForm();
+            if (response.data) {
+                // Refresh pizzas list
+                const pizzasResponse = await axios.get('/api/pizzas', { headers });
+                setPizzas(pizzasResponse.data);
+                
+                // Close modal and reset form
+                setShowEditModal(false);
+                resetForm();
+                toast.success('Pizza updated successfully!');
+            }
         } catch (err) {
             console.error('Error updating pizza:', err);
-            setFormError(err.response?.data?.message || 'Failed to update pizza');
+            const errorMessage = err.response?.data?.message || 'Failed to update pizza';
+            setFormError(errorMessage);
+
+            // If unauthorized, redirect to login
+            if (err.response?.status === 401) {
+                navigate('/admin/login');
+            }
         }
     };
 
@@ -217,7 +271,16 @@ const AdminDashboard = () => {
         if (window.confirm('Are you sure you want to delete this pizza?')) {
             try {
                 const token = localStorage.getItem('token');
-                const headers = { Authorization: `Bearer ${token}` };
+                if (!token) {
+                    setError('No authentication token found. Please login again.');
+                    navigate('/admin/login');
+                    return;
+                }
+
+                const headers = { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                };
 
                 // Delete pizza
                 await axios.delete(`/api/pizzas/${id}`, { headers });
@@ -225,9 +288,16 @@ const AdminDashboard = () => {
                 // Refresh pizzas list
                 const response = await axios.get('/api/pizzas', { headers });
                 setPizzas(response.data);
+                toast.success('Pizza deleted successfully!');
             } catch (err) {
                 console.error('Error deleting pizza:', err);
-                setError(err.response?.data?.message || 'Failed to delete pizza');
+                const errorMessage = err.response?.data?.message || 'Failed to delete pizza';
+                setError(errorMessage);
+
+                // If unauthorized, redirect to login
+                if (err.response?.status === 401) {
+                    navigate('/admin/login');
+                }
             }
         }
     };

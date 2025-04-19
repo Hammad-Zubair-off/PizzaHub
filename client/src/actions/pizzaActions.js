@@ -14,17 +14,21 @@ import {
     DELETE_PIZZA_FAILURE
 } from '../constants/pizzaConstants';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+// const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_URL =  'http://localhost:5000/api';
 
 // Fetch all pizzas
 export const fetchPizzas = (category = '', sort = '') => async (dispatch) => {
     try {
+        console.log('Error here');
         dispatch({ type: FETCH_PIZZAS_REQUEST });
         
         // Build query string
         let queryString = '';
         if (category) queryString += `?category=${category}`;
         if (sort) queryString += `${queryString ? '&' : '?'}sort=${sort}`;
+        
+        console.log('URL Requesting from String:', `${API_URL}/pizzas${queryString}`);
         
         const { data } = await axios.get(`${API_URL}/pizzas${queryString}`);
         dispatch({ type: FETCH_PIZZAS_SUCCESS, payload: data });
@@ -35,6 +39,32 @@ export const fetchPizzas = (category = '', sort = '') => async (dispatch) => {
         });
     }
 };
+
+// export const fetchPizzas = (category = '', sort = '') => async (dispatch) => {
+//     try {
+//         console.log('Dispatching FETCH_PIZZAS_REQUEST');
+//         dispatch({ type: FETCH_PIZZAS_REQUEST });
+
+//         let queryString = '';
+//         if (category) queryString += `?category=${category}`;
+//         if (sort) queryString += `${queryString ? '&' : '?'}sort=${sort}`;
+
+//         console.log('Query String:', queryString);
+//         const url = `${API_URL}/pizzas${queryString}`;
+//         console.log('URL:', url);
+//         const { data } = await axios.get(`${API_URL}/pizzas${queryString}`);
+//         console.log('Fetched data:', data);
+
+//         dispatch({ type: FETCH_PIZZAS_SUCCESS, payload: data });
+//     } catch (error) {
+//         console.error('Error fetching pizzas:', error);
+//         dispatch({
+//             type: FETCH_PIZZAS_FAILURE,
+//             payload: error.response?.data?.message || 'Error fetching pizzas'
+//         });
+//     }
+// };
+
 
 // Get Single Pizza
 export const fetchPizzaById = (id) => async (dispatch) => {
