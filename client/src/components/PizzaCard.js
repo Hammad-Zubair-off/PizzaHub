@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { Card, Badge, Modal, Row, Col, Form } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../actions/cartActions';
-import { ToastContainer, toast } from 'react-toastify';
+import { addToCart as addToCartRedux } from '../reducers/cartReducer';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './PizzaCard.css';
+import { ToastContainer } from 'react-toastify';
 
 const PizzaCard = ({ pizza }) => {
     const [modalShow, setModalShow] = useState(false);
@@ -12,8 +14,10 @@ const PizzaCard = ({ pizza }) => {
     const [quantity, setQuantity] = useState(1);
     const dispatch = useDispatch();
 
-    const handleAddToCart = () => {
-        dispatch(addToCart(pizza, selectedVarient, quantity));
+    const handleAddToCart = (item) => {
+        // console.log(pizzaId, quantity, size,"pizzaId, quantity, size");
+        console.log(item,quantity,selectedVarient,"item");
+        dispatch(addToCartRedux(item._id, quantity, selectedVarient));
         toast.success('Product added to cart!');
     };
 
@@ -23,6 +27,7 @@ const PizzaCard = ({ pizza }) => {
 
     return (
         <>
+            <ToastContainer position="top-right" autoClose={3000} />
             <Card className="pizza-card h-100" onClick={() => setModalShow(true)}>
                 <div className="pizza-image-wrapper">
                     <Card.Img variant="top" src={pizza.image} className="pizza-image" />
@@ -163,7 +168,7 @@ const PizzaCard = ({ pizza }) => {
                             </div>
                             <button 
                                 className="btn btn-primary w-100 mt-4"
-                                onClick={handleAddToCart}
+                                onClick={() => handleAddToCart(pizza)}
                             >
                                 Add to Cart - Rs. {getPrice(selectedVarient)}
                             </button>

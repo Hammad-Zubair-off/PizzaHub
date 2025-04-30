@@ -1,14 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function About() {
-  let navigate = useNavigate();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    callAboutPage();
-  }, []); // ✅ Keeping dependency array empty
-
-  const callAboutPage = async () => {
+  const callAboutPage = useCallback(async () => {
     try {
       const res = await fetch("/about", {
         method: "GET",
@@ -21,15 +17,18 @@ export default function About() {
 
       const data = await res.json();
 
-      // ✅ Correct status check
       if (!res.ok) {
         throw new Error(data.error || "Unauthorized Access");
       }
     } catch (err) {
       console.error("Error:", err.message);
-      navigate("/Loginscreen"); // ✅ Redirect user if not authenticated
+      navigate("/Loginscreen");
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    callAboutPage();
+  }, [callAboutPage]);
 
   return (
     <div>

@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Form, Alert, Button } from 'react-bootstrap';
+import { Form, Alert, Button, Spinner } from 'react-bootstrap';
 import '../styles/Auth.css';
 
 const Loginscreen = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { login, isAdmin } = useAuth();
+    const { login, isAuthenticated, isAdmin, error: authError } = useAuth();
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -15,6 +15,21 @@ const Loginscreen = () => {
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        // If user is already authenticated, redirect appropriately
+        if (isAuthenticated()) {
+            const from = location.state?.from?.pathname || '/';
+            navigate(from);
+        }
+    }, [isAuthenticated, navigate, location]);
+
+    useEffect(() => {
+        // Update local error state when auth context error changes
+        if (authError) {
+            setError(authError);
+        }
+    }, [authError]);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -30,24 +45,27 @@ const Loginscreen = () => {
         setLoading(true);
 
         try {
-            await login(formData.email, formData.password);
+            const result = await login(formData.email, formData.password);
             
-            // Check if user is admin and redirect accordingly
-            if (isAdmin()) {
-                navigate('/dashboard');
+            if (result.success) {
+                // Redirect based on user role
+                if (isAdmin()) {
+                    navigate('/admin/dashboard');
+                } else {
+                    const from = location.state?.from?.pathname || '/';
+                    navigate(from);
+                }
             } else {
-                // Redirect to the attempted page or home
-                const from = location.state?.from?.pathname || '/';
-                navigate(from);
+                setError(result.error);
             }
         } catch (err) {
             setError(err.message || 'Failed to log in');
         } finally {
             setLoading(false);
-    }
-  };
+        }
+    };
 
-  return (
+    return (
         <div className="auth-wrapper">
             <div className="auth-left">
                 <div className="auth-overlay">
@@ -70,17 +88,19 @@ const Loginscreen = () => {
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
+                                disabled={loading}
                             />
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Password</Form.Label>
                             <Form.Control
-                    type="password"
+                                type="password"
                                 name="password"
                                 value={formData.password}
                                 onChange={handleChange}
-                    required
-                  />
+                                required
+                                disabled={loading}
+                            />
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Check
@@ -89,25 +109,40 @@ const Loginscreen = () => {
                                 label="Remember me"
                                 checked={formData.rememberMe}
                                 onChange={handleChange}
+                                disabled={loading}
                             />
                         </Form.Group>
-                <div className="d-grid">
+                        <div className="d-grid gap-2">
                             <Button 
                                 variant="primary" 
                                 type="submit" 
                                 disabled={loading}
                             >
-                                {loading ? 'Logging in...' : 'Login'}
+                                {loading ? (
+                                    <>
+                                        <Spinner
+                                            as="span"
+                                            animation="border"
+                                            size="sm"
+                                            role="status"
+                                            aria-hidden="true"
+                                            className="me-2"
+                                        />
+                                        Logging in...
+                                    </>
+                                ) : 'Login'}
                             </Button>
-                </div>
+                            <Link to="/register" className="text-center">
+                                <Button variant="link" className="w-100">
+                                    Don't have an account? Register here
+                                </Button>
+                            </Link>
+                        </div>
                     </Form>
-                    <div className="text-center mt-3">
-                        <p>Don't have an account? <Link to="/register">Register here</Link></p>
-          </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default Loginscreen;

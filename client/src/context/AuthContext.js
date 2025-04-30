@@ -5,24 +5,19 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [admin, setAdmin] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Check for stored tokens on initial load
-    const userToken = localStorage.getItem('userToken');
-    const adminToken = localStorage.getItem('adminToken');
-
-    if (userToken) {
-      validateUserToken(userToken);
-    } else if (adminToken) {
-      validateAdminToken(adminToken);
+    const token = localStorage.getItem('token');
+    if (token) {
+      validateToken(token);
     } else {
       setLoading(false);
     }
   }, []);
 
-  const validateUserToken = async (token) => {
+  const validateToken = async (token) => {
     try {
       const config = {
         headers: {
@@ -30,29 +25,17 @@ export const AuthProvider = ({ children }) => {
           Authorization: `Bearer ${token}`,
         },
       };
-      const { data } = await axios.get('/api/users/validate', config);
-      setUser(data);
+      const { data } = await axios.get('/api/auth/validate', config);
+      if (data.success) {
+        setUser(data.user);
+        setError(null);
+      } else {
+        throw new Error(data.message);
+      }
     } catch (error) {
-      localStorage.removeItem('userToken');
+      localStorage.removeItem('token');
       setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const validateAdminToken = async (token) => {
-    try {
-      const config = {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      };
-      const { data } = await axios.get('/api/admin/validate', config);
-      setAdmin(data);
-    } catch (error) {
-      localStorage.removeItem('adminToken');
-      setAdmin(null);
+      setError(error.response?.data?.message || 'Session expired');
     } finally {
       setLoading(false);
     }
@@ -60,67 +43,89 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password, isAdmin = false) => {
     try {
-      const endpoint = isAdmin ? '/api/admin/login' : '/api/users/login';
+      setError(null);
+      const endpoint = isAdmin ? '/api/auth/admin/login' : '/api/auth/login';
       const { data } = await axios.post(endpoint, { email, password });
       
-      if (isAdmin) {
-        localStorage.setItem('adminToken', data.token);
-        setAdmin(data);
+      if (data.success) {
+        localStorage.setItem('token', data.token);
+        setUser(data.user);
+        return { success: true };
       } else {
-        localStorage.setItem('userToken', data.token);
-        setUser(data);
+        throw new Error(data.message);
       }
-      return { success: true };
     } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Login failed';
+      setError(errorMessage);
       return {
         success: false,
-        error: error.response?.data?.message || 'Login failed',
+        error: errorMessage,
       };
     }
   };
 
   const register = async (userData) => {
     try {
-      const { data } = await axios.post('/api/users/register', userData);
-      localStorage.setItem('userToken', data.token);
-      setUser(data);
-      return { success: true };
+      setError(null);
+      const { data } = await axios.post('/api/auth/register', userData);
+      
+      if (data.success) {
+        localStorage.setItem('token', data.token);
+        setUser(data.user);
+        return { success: true };
+      } else {
+        throw new Error(data.message);
+      }
     } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Registration failed';
+      setError(errorMessage);
       return {
         success: false,
-        error: error.response?.data?.message || 'Registration failed',
+        error: errorMessage,
       };
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('userToken');
-    localStorage.removeItem('adminToken');
-    setUser(null);
-    setAdmin(null);
+  const logout = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (token) {
+        await axios.post('/api/auth/logout', {}, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      localStorage.removeItem('token');
+      setUser(null);
+      setError(null);
+    }
   };
 
   const isAuthenticated = () => {
-    return !!user || !!admin;
+    return !!user;
   };
 
   const isAdmin = () => {
-    return !!admin;
+    return user?.role === 'admin' || user?.isAdmin;
+  };
+
+  const value = {
+    user,
+    loading,
+    error,
+    login,
+    register,
+    logout,
+    isAuthenticated,
+    isAdmin,
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        admin,
-        loading,
-        login,
-        register,
-        logout,
-        isAuthenticated,
-        isAdmin,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

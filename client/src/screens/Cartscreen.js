@@ -1,115 +1,187 @@
 import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { Row, Col, ListGroup, Image, Button } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { 
+    fetchCartItems, 
+    removeFromCart, 
+    updateCartItemQuantity, 
+    clearCartItems 
+} from '../reducers/cartReducer';
+import { Button, Container, Table, Form, Row, Col, Card } from 'react-bootstrap';
 import { FaTrash, FaPlus, FaMinus } from 'react-icons/fa';
-import { removeFromCart, updateCartItemQuantity } from '../actions/cartActions';
-import ProceedToCheckout from '../components/ProceedToCheckout';
+import { useAuth } from '../context/AuthContext';
 
-const CartScreen = () => {
+const Cartscreen = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { isAuthenticated } = useAuth();
+    const { cartItems, loading, error } = useSelector(state => state.cartReducer);
 
-    // Update the selector to use cartReducer instead of cart
-    const cart = useSelector((state) => state.cartReducer || { cartItems: [] });
-    const { cartItems = [] } = cart;
-    
     useEffect(() => {
-        console.log('Current cart state:', cart);
-        console.log('Cart items:', cartItems);
-    }, [cart, cartItems]);
+        if (isAuthenticated()) {
+            dispatch(fetchCartItems());
+        } else {
+            navigate('/login');
+        }
+    }, [dispatch, isAuthenticated, navigate]);
 
-    const removeFromCartHandler = (id, variant) => {
-        dispatch(removeFromCart(id, variant));
-    };
-
-    const updateQuantityHandler = (id, variant, quantity) => {
-        if (quantity > 0 && quantity <= 10) {
-            dispatch(updateCartItemQuantity(id, variant, quantity));
+    const handleQuantityChange = (itemId, newQuantity) => {
+        if (newQuantity > 0) {
+            dispatch(updateCartItemQuantity(itemId, newQuantity));
         }
     };
 
-    return (
-        <div className="cart-screen">
-            <h2 className="text-center mb-4">
-                <i className="fas fa-shopping-cart"></i> My Cart
-            </h2>
-                    
-            {!cartItems || cartItems.length === 0 ? (
+    const handleRemoveItem = (itemId) => {
+        dispatch(removeFromCart(itemId));
+    };
+
+    const handleClearCart = () => {
+        dispatch(clearCartItems());
+    };
+
+    const calculateSubtotal = () => {
+        return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    };
+
+    if (loading) {
+        return (
+            <Container className="py-5">
                 <div className="text-center">
-                    <h3>Your cart is empty</h3>
-                    <p>Add some delicious pizzas to get started!</p>
+                    <div className="spinner-border" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </Container>
+        );
+    }
+
+    if (error) {
+        return (
+            <Container className="py-5">
+                <div className="alert alert-danger">{error}</div>
+            </Container>
+        );
+    }
+
+    return (
+        <Container className="py-5">
+            <h2 className="mb-4">Shopping Cart</h2>
+            
+            {cartItems.length === 0 ? (
+                <div className="text-center py-5">
+                    <h4>Your cart is empty</h4>
+                    <Link to="/menu" className="btn btn-primary mt-3">
+                        Continue Shopping
+                    </Link>
                 </div>
             ) : (
-                <Row>
-                    <Col md={8}>
-                        <ListGroup variant="flush">
+                <>
+                    <Table responsive className="align-middle">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Size</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
                             {cartItems.map((item) => (
-                                <ListGroup.Item key={`${item._id}-${item.variant}`}>
-                                    <Row className="align-items-center">
-                                        <Col md={2}>
-                                            <Image src={item.image} alt={item.name} fluid rounded />
-                                        </Col>
-                                        <Col md={3}>
-                                            <h5>{item.name}</h5>
-                                            <p className="mb-0">Size: {item.variant}</p>
-                                        </Col>
-                                        <Col md={2}>
-                                            <p className="mb-0">Rs. {item.price}/-</p>
-                                        </Col>
-                                        <Col md={3}>
-                                            <div className="d-flex align-items-center quantity-selector">
-                                                <Button
-                                                    variant="outline-secondary"
-                                                    size="sm"
-                                                    onClick={() => 
-                                                        updateQuantityHandler(item._id, item.variant, item.quantity - 1)
-                                                    }
-                                                >
-                                                    <FaMinus />
-                                                </Button>
-                                                <span className="mx-2">{item.quantity}</span>
-                                                <Button
-                                                    variant="outline-secondary"
-                                                    size="sm"
-                                                    onClick={() => 
-                                                        updateQuantityHandler(item._id, item.variant, item.quantity + 1)
-                                                    }
-                                                >
-                                                    <FaPlus />
-                                                </Button>
-                                            </div>
-                                        </Col>
-                                        <Col md={2}>
-                                            <Button
-                                                variant="danger"
-                                                onClick={() => removeFromCartHandler(item._id, item.variant)}
+                                <tr key={item?._id}>
+                                    <td>
+                                        <div className="d-flex align-items-center">
+                                            <img 
+                                                src={item?.pizza?.image} 
+                                                alt={item?.pizza?.name}
+                                                style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                                                className="me-2"
+                                            />
+                                            <span>{item?.pizza?.name}</span>
+                                        </div>
+                                    </td>
+                                    <td>{item?.size}</td>
+                                    <td>${item?.price?.toFixed(2)}</td>
+                                    <td>
+                                        <div className="d-flex align-items-center">
+                                            <Button 
+                                                variant="outline-secondary" 
+                                                size="sm"
+                                                onClick={() => handleQuantityChange(item._id, item.quantity - 1)}
                                             >
-                                                <FaTrash />
+                                                <FaMinus />
                                             </Button>
-                                        </Col>
-                                    </Row>
-                                </ListGroup.Item>
+                                            <Form.Control
+                                                type="number"
+                                                value={item?.quantity}
+                                                min="1"
+                                                className="mx-2"
+                                                style={{ width: '60px' }}
+                                                onChange={(e) => handleQuantityChange(item._id, parseInt(e.target.value))}
+                                            />
+                                            <Button 
+                                                variant="outline-secondary" 
+                                                size="sm"
+                                                onClick={() => handleQuantityChange(item._id, item.quantity + 1)}
+                                            >
+                                                <FaPlus />
+                                            </Button>
+                                        </div>
+                                    </td>
+                                    <td>${(item?.price * item?.quantity).toFixed(2)}</td>
+                                    <td>
+                                        <Button 
+                                            variant="danger" 
+                                            size="sm"
+                                            onClick={() => handleRemoveItem(item._id)}
+                                        >
+                                            <FaTrash />
+                                        </Button>
+                                    </td>
+                                </tr>
                             ))}
-                        </ListGroup>
-                    </Col>
-                    <Col md={4}>
-                        <ProceedToCheckout />
-                    </Col>
-                </Row>
+                        </tbody>
+                    </Table>
+
+                    <Row className="mt-4">
+                        <Col md={6}>
+                            <Button 
+                                variant="outline-danger" 
+                                onClick={handleClearCart}
+                            >
+                                Clear Cart
+                            </Button>
+                        </Col>
+                        <Col md={6}>
+                            <Card className="p-3">
+                                <h4>Order Summary</h4>
+                                <div className="d-flex justify-content-between mb-2">
+                                    <span>Subtotal:</span>
+                                    <span>${calculateSubtotal().toFixed(2)}</span>
+                                </div>
+                                <div className="d-flex justify-content-between mb-2">
+                                    <span>Tax (10%):</span>
+                                    <span>${(calculateSubtotal() * 0.1).toFixed(2)}</span>
+                                </div>
+                                <div className="d-flex justify-content-between mb-3">
+                                    <strong>Total:</strong>
+                                    <strong>${(calculateSubtotal() * 1.1).toFixed(2)}</strong>
+                                </div>
+                                <Button 
+                                    variant="primary" 
+                                    className="w-100"
+                                    onClick={() => navigate('/checkout')}
+                                >
+                                    Proceed to Checkout
+                                </Button>
+                            </Card>
+                        </Col>
+                    </Row>
+                </>
             )}
-            <style jsx>{`
-                .cart-screen {
-                    padding: 20px;
-                }
-                .quantity-selector {
-                    justify-content: center;
-                }
-                .quantity-selector span {
-                    min-width: 30px;
-                    text-align: center;
-                }
-            `}</style>
-        </div>
+        </Container>
     );
 };
 
-export default CartScreen;
+export default Cartscreen;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Row, Col, Card, Button, Form, Table, Alert, Modal, Badge } from 'react-bootstrap';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -41,16 +41,7 @@ const AdminDashboard = () => {
     });
     const [formError, setFormError] = useState('');
 
-    // Fetch data on component mount
-    useEffect(() => {
-        if (!isAdmin()) {
-            navigate('/admin/login');
-            return;
-        }
-        fetchData();
-    }, [isAdmin, navigate]);
-
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
             setLoading(true);
             setError(null);
@@ -91,7 +82,16 @@ const AdminDashboard = () => {
                 navigate('/admin/login');
             }
         }
-    };
+    }, [navigate]);
+
+    // Fetch data on component mount
+    useEffect(() => {
+        if (!isAdmin()) {
+            navigate('/admin/login');
+            return;
+        }
+        fetchData();
+    }, [isAdmin, navigate, fetchData]);
 
     // Handle form input changes
     const handleInputChange = (e) => {

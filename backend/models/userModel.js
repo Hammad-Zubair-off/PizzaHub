@@ -7,6 +7,27 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: String, enum: ['customer', 'admin'], default: 'customer' }, // Role-based authentication
+    cartItems: [{
+        pizza: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Pizza',
+            required: true
+        },
+        quantity: {
+            type: Number,
+            required: true,
+            default: 1
+        },
+        size: {
+            type: String,
+            required: true,
+            enum: ['small', 'medium', 'large']
+        },
+        price: {
+            type: Number,
+            required: false
+        }
+    }]
 }, { timestamps: true });
 
 // **Hash password before saving**

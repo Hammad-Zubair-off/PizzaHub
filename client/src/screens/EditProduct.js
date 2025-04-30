@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const EditProduct = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const product = location.state?.data || {};
+  const product = useMemo(() => location.state?.data || {}, [location.state]);
   
   const [productName, setProductName] = useState("");
   const [selectedVariants, setSelectedVariants] = useState([]);

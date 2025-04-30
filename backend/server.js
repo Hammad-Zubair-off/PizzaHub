@@ -31,6 +31,7 @@ const pizzasRoute = require('./routes/pizzasRoute');
 const authRoutes = require('./routes/authRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const stripeRoutes = require('./routes/stripe');
+const cartRoutes = require('./routes/cartRoutes');
 
 // Test endpoint
 app.get('/api/test', (req, res) => {
@@ -41,6 +42,7 @@ app.use("/api/pizzas", pizzasRoute);
 app.use("/api/auth", authRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/stripe", stripeRoutes);
+app.use("/api/cart", cartRoutes);
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {

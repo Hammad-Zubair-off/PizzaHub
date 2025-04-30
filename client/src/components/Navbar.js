@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './Navbar.css';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Dropdown, Container, Nav, Navbar as BootstrapNavbar } from 'react-bootstrap';
+import { Dropdown, Container, Nav, Navbar as BootstrapNavbar, Modal, Form, Button, Alert } from 'react-bootstrap';
 
 // CategoryFilter Component
 const CategoryFilter = () => (
@@ -77,68 +77,173 @@ const CartButton = ({ itemCount }) => (
     </Link>
 );
 
+// Admin Login Modal Component
+const AdminLoginModal = ({ show, handleClose, handleSubmit, error, loading }) => {
+    const [formData, setFormData] = useState({
+        email: '',
+        password: ''
+    });
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    return (
+        <Modal show={show} onHide={handleClose} centered>
+            <Modal.Header closeButton>
+                <Modal.Title>Admin Login</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                {error && <Alert variant="danger">{error}</Alert>}
+                <Form onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSubmit(formData);
+                }}>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Email</Form.Label>
+                        <Form.Control
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            required
+                            disabled={loading}
+                        />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Password</Form.Label>
+                        <Form.Control
+                            type="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            required
+                            disabled={loading}
+                        />
+                    </Form.Group>
+                    <div className="d-grid">
+                        <Button 
+                            variant="primary" 
+                            type="submit" 
+                            disabled={loading}
+                        >
+                            {loading ? 'Logging in...' : 'Login as Admin'}
+                        </Button>
+                    </div>
+                </Form>
+            </Modal.Body>
+        </Modal>
+    );
+};
+
 // Main Navbar Component
 export default function Navbar() {
     const cartState = useSelector(state => state.cartReducer);
-    const { user, isAuthenticated, logout } = useAuth();
+    const { user, isAuthenticated, isAdmin, login, logout } = useAuth();
     const navigate = useNavigate();
+    const [showAdminModal, setShowAdminModal] = useState(false);
+    const [adminError, setAdminError] = useState('');
+    const [adminLoading, setAdminLoading] = useState(false);
 
     const handleLogout = () => {
         logout();
         navigate('/');
     };
 
+    const handleAdminLogin = async (formData) => {
+        setAdminError('');
+        setAdminLoading(true);
+        try {
+            const result = await login(formData.email, formData.password, true);
+            if (result.success) {
+                setShowAdminModal(false);
+                navigate('/admin/dashboard');
+            } else {
+                setAdminError(result.error);
+            }
+        } catch (err) {
+            setAdminError(err.message || 'Failed to log in');
+        } finally {
+            setAdminLoading(false);
+        }
+    };
+
     return (
-        <BootstrapNavbar expand="lg" className="navbar shadow-sm sticky-top bg-white py-2">
-            <Container>
-                <BootstrapNavbar.Brand as={Link} to="/" className="fw-bold text-primary">
-                    <i className="fas fa-pizza-slice me-2"></i>
-                    KASURI PIZZA
-                </BootstrapNavbar.Brand>
+        <>
+            <BootstrapNavbar expand="lg" className="navbar shadow-sm sticky-top bg-white py-2">
+                <Container>
+                    <BootstrapNavbar.Brand as={Link} to="/" className="fw-bold text-primary">
+                        <i className="fas fa-pizza-slice me-2"></i>
+                        KASURI PIZZA
+                    </BootstrapNavbar.Brand>
 
-                <BootstrapNavbar.Toggle aria-controls="navbarNav" />
+                    <BootstrapNavbar.Toggle aria-controls="navbarNav" />
 
-                <BootstrapNavbar.Collapse id="navbarNav">
-                    <Nav className="me-auto">
-                        <Nav.Link as={Link} to="/" className="px-3">Home</Nav.Link>
-                        <Nav.Link as={Link} to="/menu" className="px-3">Menu</Nav.Link>
-                        <Nav.Link as={Link} to="/about" className="px-3">About</Nav.Link>
-                        <Nav.Link as={Link} to="/contact" className="px-3">Contact</Nav.Link>
-                    </Nav>
-
-                    <div className="d-flex align-items-center gap-3">
-                        {/* Admin Panel Button - Always visible */}
-                        <Link 
-                            className="btn btn-outline-primary" 
-                            to="/dashboard"
-                        >
-                            <i className="fas fa-user-shield me-1"></i>
-                            Admin
-                        </Link>
-
-                        {/* Filter */}
-                        <CategoryFilter />
-
-                        {/* Auth Buttons */}
-                        {isAuthenticated() ? (
-                            <div className="d-flex align-items-center gap-2">
-                                <CartButton itemCount={cartState.cartItems.length} />
-                                <UserMenu user={user} handleLogout={handleLogout} />
-                            </div>
-                        ) : (
-                            <div className="d-flex align-items-center gap-2">
-                                <Link className="nav-link" to="/login">
-                                    <i className="fas fa-sign-in-alt me-1"></i>
-                                    Login
-                                </Link>
-                                <Link className="btn btn-primary rounded-pill px-4" to="/register">
-                                    Sign Up
+                    <BootstrapNavbar.Collapse id="navbarNav">
+                        <Nav className="ms-auto align-items-center">
+                            <CategoryFilter />
+                            <Link className="nav-link px-3" to="/menu">
+                                Menu
                             </Link>
-                </div>
-                        )}
-            </div>
-                </BootstrapNavbar.Collapse>
-            </Container>
-        </BootstrapNavbar>
+                            <Link className="nav-link px-3" to="/about">
+                                About
+                            </Link>
+                            <CartButton itemCount={cartState.cartItems.length} />
+                            
+                            {isAuthenticated() ? (
+                                <>
+                                    {isAdmin() ? (
+                                        <Link 
+                                            className="nav-link px-3" 
+                                            to="/admin/dashboard"
+                                        >
+                                            <i className="fas fa-user-shield me-1"></i>
+                                            Admin Panel
+                                        </Link>
+                                    ) : (
+                                        <button
+                                            className="nav-link px-3"
+                                            onClick={() => setShowAdminModal(true)}
+                                        >
+                                            <i className="fas fa-user-shield me-1"></i>
+                                            Admin Login
+                                        </button>
+                                    )}
+                                    <UserMenu user={user} handleLogout={handleLogout} />
+                                </>
+                            ) : (
+                                <>
+                                    <button
+                                        className="nav-link px-3"
+                                        onClick={() => setShowAdminModal(true)}
+                                    >
+                                        <i className="fas fa-user-shield me-1"></i>
+                                        Admin Login
+                                    </button>
+                                    <Link className="nav-link px-3" to="/login">
+                                        Login
+                                    </Link>
+                                    <Link className="nav-link px-3" to="/register">
+                                        Register
+                                    </Link>
+                                </>
+                            )}
+                        </Nav>
+                    </BootstrapNavbar.Collapse>
+                </Container>
+            </BootstrapNavbar>
+
+            <AdminLoginModal
+                show={showAdminModal}
+                handleClose={() => setShowAdminModal(false)}
+                handleSubmit={handleAdminLogin}
+                error={adminError}
+                loading={adminLoading}
+            />
+        </>
     );
 }

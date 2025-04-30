@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Table, Badge } from 'react-bootstrap';
+import { Container, Card, Table, Badge } from 'react-bootstrap';
 import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
 import Loader from '../components/Loader';
 
 const OrdersScreen = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const { isAuthenticated } = useAuth();
 
     useEffect(() => {
         const fetchOrders = async () => {

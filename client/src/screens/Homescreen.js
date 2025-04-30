@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchPizzas } from '../actions/pizzaActions';
 import PizzaCard from '../components/PizzaCard';
-import { Row, Col, Container, Alert, Button } from 'react-bootstrap';
+import { Row, Col, Container, Alert } from 'react-bootstrap';
 import Loader from '../components/Loader';
 import { Link } from 'react-router-dom';
 

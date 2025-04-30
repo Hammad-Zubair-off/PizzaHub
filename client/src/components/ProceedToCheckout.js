@@ -5,6 +5,7 @@ import { Button, Spinner, Form } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { loadStripe } from '@stripe/stripe-js';
+import { clearCart } from '../actions/cartActions';
 
 // Initialize Stripe with the publishable key
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY || 'pk_test_51REHrHH0xzDgBkN3jfhb6Ff0mrC4tZMqP2GXYlEmVHr6iyFMv0W2uG88VXOJimnuppdaRVB9MnVDrfAtHL5bfiIP00eOa7M9GF');
@@ -39,6 +40,7 @@ const ProceedToCheckout = () => {
     const handleCheckout = async () => {
         if (cartItems.length === 0) {
             toast.error('Your cart is empty');
+            navigate('/cart');
             return;
         }
 
@@ -87,6 +89,10 @@ const ProceedToCheckout = () => {
             if (result.error) {
                 throw new Error(result.error.message);
             }
+
+            // Clear cart after successful checkout initiation
+            dispatch(clearCart());
+            
         } catch (error) {
             console.error('Checkout error:', error);
             toast.error(`Checkout failed: ${error.message}`);
