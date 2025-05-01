@@ -15,8 +15,8 @@ const pizzaSchema = new mongoose.Schema({
     }],
     category: {
         type: String,
-        required: true,
-        enum: ['Veg', 'Non-Veg']
+        required: false,
+        default: null
     },
     image: {
         type: String,

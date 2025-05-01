@@ -32,6 +32,10 @@ router.post('/', authenticate, async (req, res) => {
 router.get('/myorders', authenticate, async (req, res) => {
     try {
         const orders = await Order.find({ user: req.user.id })
+            .populate({
+                path: 'items.pizza',
+                select: 'name description category image'  // Select the fields we need
+            })
             .sort({ createdAt: -1 });
         res.json({
             success: true,

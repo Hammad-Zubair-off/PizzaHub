@@ -12,7 +12,7 @@ const AboutContainer = styled.div`
 
 const Title = styled.h1`
   color: ${theme.colors.primary};
-  font-family: 'Playfair Display', serif;
+  font-family: 'Nunito', sans-serif;
   font-weight: 700;
   font-size: 3.5rem;
   margin-bottom: 3rem;
@@ -37,7 +37,7 @@ const Section = styled.section`
 
 const SectionTitle = styled.h2`
   color: ${theme.colors.primary};
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Nunito', sans-serif;
   font-size: 2.2rem;
   font-weight: 600;
   margin-bottom: 2rem;
@@ -61,7 +61,7 @@ const Text = styled.p`
   line-height: 1.8;
   color: #4A4A4A;
   margin-bottom: 1.8rem;
-  font-family: 'Open Sans', sans-serif;
+  font-family: 'Nunito', sans-serif;
   letter-spacing: 0.3px;
 `;
 
@@ -83,7 +83,7 @@ const FeatureCard = styled.div`
 
   h3 {
     color: ${theme.colors.primary};
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Nunito', sans-serif;
     font-size: 1.5rem;
     font-weight: 600;
     margin-bottom: 1.2rem;
@@ -97,7 +97,7 @@ const FeatureCard = styled.div`
     font-size: 1.05rem;
     line-height: 1.7;
     margin-bottom: 0;
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Nunito', sans-serif;
   }
 `;
 
@@ -141,7 +141,7 @@ const FounderInfo = styled.div`
 
   h3 {
     color: ${theme.colors.primary};
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Nunito', sans-serif;
     font-size: 1.8rem;
     font-weight: 600;
     margin-bottom: 0.5rem;
@@ -149,7 +149,7 @@ const FounderInfo = styled.div`
 
   p {
     color: #666;
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Nunito', sans-serif;
     font-size: 1.1rem;
   }
 `;

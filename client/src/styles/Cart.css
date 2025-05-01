@@ -20,7 +20,9 @@
     padding: 2rem 1rem;
     margin: 0 auto;
     min-height: 100vh;
-    background: linear-gradient(135deg, var(--background-main) 0%, #ffffff 100%);
+    /* background: linear-gradient(135deg, var(--background-main) 0%, #ffffff 100%);
+     */
+     background-color: #FFF8F3;
 }
 
 /* Cart Header */

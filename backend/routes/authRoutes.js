@@ -124,7 +124,8 @@ router.post('/register', async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                createdAt: user.createdAt
             }
         });
     } catch (err) {
@@ -184,7 +185,8 @@ router.post('/login', async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                createdAt: user.createdAt
             }
         });
     } catch (err) {

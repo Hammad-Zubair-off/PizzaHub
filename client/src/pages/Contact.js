@@ -11,7 +11,7 @@ const ContactContainer = styled.div`
 
 const Title = styled.h1`
   color: #E44D26;
-  font-family: 'Playfair Display', serif;
+  font-family: 'Nunito', sans-serif;
   font-weight: 700;
   font-size: 3.5rem;
   margin-bottom: 3rem;
@@ -59,7 +59,7 @@ const InfoSection = styled.div`
   h3 {
     color: #E44D26;
     margin-bottom: 1.5rem;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Nunito', sans-serif;
     font-size: 1.8rem;
     font-weight: 600;
     position: relative;
@@ -83,7 +83,7 @@ const InfoSection = styled.div`
     display: flex;
     align-items: center;
     gap: 1rem;
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Nunito', sans-serif;
     font-size: 1.1rem;
     line-height: 1.6;
 
@@ -111,7 +111,7 @@ const StyledForm = styled(Form)`
   .form-label {
     color: #2D3436;
     font-weight: 600;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Nunito', sans-serif;
     font-size: 1.1rem;
     margin-bottom: 0.5rem;
   }
@@ -120,7 +120,7 @@ const StyledForm = styled(Form)`
     border-radius: 12px;
     padding: 0.8rem 1.2rem;
     border: 2px solid #E8E8E8;
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Nunito', sans-serif;
     font-size: 1rem;
     transition: all 0.3s ease;
     background-color: #FAFAFA;
@@ -153,7 +153,7 @@ const SubmitButton = styled(Button)`
   border: none;
   padding: 1rem 2rem;
   font-weight: 600;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Nunito', sans-serif;
   font-size: 1.1rem;
   border-radius: 12px;
   width: 100%;
@@ -196,7 +196,7 @@ const SubmitButton = styled(Button)`
 
 const StyledAlert = styled(Alert)`
   border-radius: 12px;
-  font-family: 'Open Sans', sans-serif;
+  font-family: 'Nunito', sans-serif;
   border: none;
   
   &.alert-success {
@@ -208,7 +208,7 @@ const StyledAlert = styled(Alert)`
 
 const FormTitle = styled.h3`
   color: #E44D26;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Nunito', sans-serif;
   font-size: 1.8rem;
   font-weight: 600;
   margin-bottom: 2rem;

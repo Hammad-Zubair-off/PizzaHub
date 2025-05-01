@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, Badge, Modal, Row, Col, Form } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../actions/cartActions';
 import { addToCart as addToCartRedux } from '../reducers/cartReducer';
 import { toast } from 'react-toastify';
@@ -9,6 +9,8 @@ import styled from 'styled-components';
 import { theme } from '../styles/theme';
 import { FaStar, FaClock, FaPepperHot, FaShoppingCart } from 'react-icons/fa';
 import { ToastContainer } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+
 
 const StyledCard = styled(Card)`
   border: none;
@@ -69,13 +71,17 @@ const CategoryBadge = styled(Badge)`
   z-index: 2;
   background: ${props => props.bg === 'success' 
     ? 'linear-gradient(135deg, #22c55e, #10b981)'
-    : 'linear-gradient(135deg, #ef4444, #f87171)'
+    : props.bg === 'danger' 
+      ? 'linear-gradient(135deg, #ef4444, #f87171)'
+      : 'linear-gradient(135deg, #f5f5f5, #e0e0e0)'
   };
   border: 1px solid rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(8px);
   box-shadow: 0 2px 8px ${props => props.bg === 'success' 
     ? 'rgba(16, 185, 129, 0.15)'
-    : 'rgba(239, 68, 68, 0.15)'
+    : props.bg === 'danger' 
+      ? 'rgba(239, 68, 68, 0.15)'
+      : 'rgba(224, 224, 224, 0.15)'
   };
   letter-spacing: 0.5px;
   display: flex;
@@ -89,7 +95,9 @@ const CategoryBadge = styled(Badge)`
     transform: translateY(-2px);
     box-shadow: 0 4px 12px ${props => props.bg === 'success' 
       ? 'rgba(16, 185, 129, 0.2)'
-      : 'rgba(239, 68, 68, 0.2)'
+      : props.bg === 'danger' 
+        ? 'rgba(239, 68, 68, 0.2)'
+        : 'rgba(224, 224, 224, 0.2)'
     };
   }
 `;
@@ -354,12 +362,35 @@ const PizzaCard = ({ pizza }) => {
     const [selectedVarient, setSelectedVarient] = useState(pizza.varients[0]);
     const [quantity, setQuantity] = useState(1);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { userInfo } = useSelector(state => state.userLogin || {});
+
+
+    // const handleAddToCart = (item) => {
+        
+    //     dispatch(addToCartRedux(item._id, quantity, selectedVarient));
+    //     toast.success('Product added to cart!');
+    // };
 
     const handleAddToCart = (item) => {
-        
-        dispatch(addToCartRedux(item._id, quantity, selectedVarient));
-        toast.success('Product added to cart!');
-    };
+      // Check if user is logged in
+      if (!userInfo) {
+          // If not logged in, close the modal and redirect to login page
+          setModalShow(false);
+          toast.warning('Please login to add items to your cart');
+          
+          // Save the current URL to redirect back after login
+          localStorage.setItem('redirectAfterLogin', window.location.pathname);
+          
+          // Redirect to login page
+          navigate('/login');
+          return;
+      }
+      
+      // If user is logged in, proceed with adding to cart
+      dispatch(addToCartRedux(item._id, quantity, selectedVarient));
+      toast.success('Product added to cart!');
+  };
 
     const getPrice = (varient) => {
         return pizza.prices.find(p => p.varient === varient)?.price || 0;
@@ -371,11 +402,15 @@ const PizzaCard = ({ pizza }) => {
             <StyledCard onClick={() => setModalShow(true)}>
                 <ImageWrapper>
                     <StyledImage src={pizza.image} alt={pizza.name} />
-                    <CategoryBadge 
-                        bg={pizza.category === 'Veg' ? 'success' : 'danger'} 
-                    >
-                        {pizza.category}
-                    </CategoryBadge>
+                    {pizza.category && (
+                        <CategoryBadge 
+                            bg={pizza.category === 'Veg' ? 'success' : 
+                                pizza.category === 'Non-Veg' ? 'danger' : 
+                                'secondary'} 
+                        >
+                            {pizza.category}
+                        </CategoryBadge>
+                    )}
                     {pizza.popularity >= 90 && (
                         <PopularBadge>
                             Popular
