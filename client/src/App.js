@@ -15,7 +15,8 @@ import NotFoundScreen from './screens/NotFoundScreen';
 import SuccessScreen from './screens/SuccessScreen';
 import OrdersScreen from './screens/OrdersScreen';
 import MenuScreen from './screens/MenuScreen';
-import About from './screens/About';
+import About from './pages/About';
+import Contact from './pages/Contact';
 import ProductList from './screens/ProductList';
 import EditProduct from './screens/EditProduct';
 import AddProduct from './screens/AddProduct';
@@ -31,6 +32,7 @@ function App() {
           <Route path="/" element={<Homescreen />} />
           <Route path="/menu" element={<MenuScreen />} />
           <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Loginscreen />} />
           <Route path="/register" element={<Registerscreen />} />
           <Route path="/admin/login" element={<AdminLogin />} />

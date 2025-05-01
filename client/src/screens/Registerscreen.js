@@ -1,34 +1,39 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import AuthForm from '../components/AuthForm';
-import FormInput from '../components/FormInput';
+import { Form, Alert, Button, Spinner } from 'react-bootstrap';
+import '../styles/Auth.css';
 
-export default function Registerscreen() {
+const Registerscreen = () => {
   const navigate = useNavigate();
-  const { register, error, loading } = useAuth();
+  const { register, error: authError } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     cpassword: ''
   });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [formErrors, setFormErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
     
     // Clear error when user starts typing
     if (formErrors[name]) {
-      setFormErrors({ ...formErrors, [name]: '' });
+      setFormErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
   const validateForm = () => {
     const errors = {};
     
-    if (!formData.name) {
+    if (!formData.name.trim()) {
       errors.name = 'Name is required';
     }
     
@@ -60,69 +65,145 @@ export default function Registerscreen() {
     if (!validateForm()) {
       return;
     }
+
+    setError('');
+    setLoading(true);
     
-    const { name, email, password } = formData;
-    const result = await register({ name, email, password });
-    
-    if (result.success) {
-      navigate('/login');
+    try {
+      const { name, email, password } = formData;
+      const result = await register({ name, email, password });
+      
+      if (result.success) {
+        navigate('/login');
+      } else {
+        setError(result.error || 'Registration failed');
+      }
+    } catch (err) {
+      setError(err.message || 'An error occurred during registration');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <AuthForm
-      title="Create Account"
-      submitText="Register"
-      onSubmit={handleSubmit}
-      error={error}
-      loading={loading}
-      footerText="Already have an account?"
-      footerLinkText="Sign In"
-      footerLinkTo="/login"
-    >
-      <FormInput
-        label="Full Name"
-                    type="text"
-                    name="name"
-        value={formData.name}
-        onChange={handleChange}
-        placeholder="John Doe"
-                    required
-        error={formErrors.name}
-      />
-      
-      <FormInput
-        label="Email Address"
-                    type="email"
-                    name="email"
-        value={formData.email}
-        onChange={handleChange}
-                    placeholder="name@example.com"
-                    required
-        error={formErrors.email}
-      />
-      
-      <FormInput
-        label="Password"
-                    type="password"
-                    name="password"
-        value={formData.password}
-        onChange={handleChange}
-                    placeholder="Password"
-                    required
-        error={formErrors.password}
-      />
-      
-      <FormInput
-        label="Confirm Password"
-                    type="password"
-                    name="cpassword"
-        value={formData.cpassword}
-        onChange={handleChange}
-                    placeholder="Confirm Password"
-                    required
-        error={formErrors.cpassword}
-      />
-    </AuthForm>
+    <div className="auth-wrapper">
+      <div className="auth-left">
+        <div className="auth-overlay">
+          <div className="auth-content">
+            <h1>Join Our Food Community</h1>
+            <p>Create an account to unlock a world of delicious possibilities. Fresh, hot pizzas are just moments away.</p>
+          </div>
+        </div>
+      </div>
+      <div className="auth-right">
+        <div className="auth-form-container">
+          <div className="auth-header">
+            <h2>Create Account</h2>
+            <p>Fill in your details to get started</p>
+          </div>
+          
+          {(error || authError) && (
+            <Alert variant="danger">
+              {error || authError}
+            </Alert>
+          )}
+
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className="mb-4">
+              <Form.Label>Full Name</Form.Label>
+              <Form.Control
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="John Doe"
+                isInvalid={!!formErrors.name}
+                disabled={loading}
+              />
+              <Form.Control.Feedback type="invalid">
+                {formErrors.name}
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group className="mb-4">
+              <Form.Label>Email Address</Form.Label>
+              <Form.Control
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="name@example.com"
+                isInvalid={!!formErrors.email}
+                disabled={loading}
+              />
+              <Form.Control.Feedback type="invalid">
+                {formErrors.email}
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group className="mb-4">
+              <Form.Label>Password</Form.Label>
+              <Form.Control
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Create a password"
+                isInvalid={!!formErrors.password}
+                disabled={loading}
+              />
+              <Form.Control.Feedback type="invalid">
+                {formErrors.password}
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group className="mb-4">
+              <Form.Label>Confirm Password</Form.Label>
+              <Form.Control
+                type="password"
+                name="cpassword"
+                value={formData.cpassword}
+                onChange={handleChange}
+                placeholder="Confirm your password"
+                isInvalid={!!formErrors.cpassword}
+                disabled={loading}
+              />
+              <Form.Control.Feedback type="invalid">
+                {formErrors.cpassword}
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Button 
+              variant="primary" 
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                    className="me-2"
+                  />
+                  Creating Account...
+                </>
+              ) : 'Create Account'}
+            </Button>
+
+            <div className="auth-footer">
+              <p>
+                Already have an account?{' '}
+                <Link to="/login">Sign In</Link>
+              </p>
+            </div>
+          </Form>
+        </div>
+      </div>
+    </div>
   );
-}
+};
+
+export default Registerscreen;

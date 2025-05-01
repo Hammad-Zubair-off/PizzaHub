@@ -3,7 +3,8 @@ import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { clearCart } from '../actions/cartActions';
-import { FaCheckCircle } from 'react-icons/fa';
+import { FaCheckCircle, FaShoppingBag, FaClipboardList } from 'react-icons/fa';
+import '../styles/SuccessScreen.css';
 
 const SuccessScreen = () => {
   const dispatch = useDispatch();
@@ -14,30 +15,34 @@ const SuccessScreen = () => {
   }, [dispatch]);
 
   return (
-    <Container className="py-5">
-      <Row className="justify-content-center">
+    <Container fluid className="success-container">
+      <Row className="justify-content-center w-100">
         <Col md={8} lg={6}>
-          <Card className="text-center shadow-sm">
+          <Card className="success-card">
             <Card.Body className="p-5">
-              <div className="mb-4">
-                <FaCheckCircle size={80} className="text-success" />
-              </div>
-              <Card.Title className="h3 mb-3">Payment Successful!</Card.Title>
-              <Card.Text className="mb-4">
-                Thank you for your order. Your payment has been processed successfully.
-                We'll send you an email with your order details shortly.
-              </Card.Text>
-              <div className="d-grid gap-2">
-                <Link to="/menu">
-                  <Button variant="primary" size="lg" className="w-100">
-                    Continue Shopping
-                  </Button>
-                </Link>
-                <Link to="/orders">
-                  <Button variant="outline-secondary" size="lg" className="w-100">
-                    View Orders
-                  </Button>
-                </Link>
+              <div className="text-center">
+                <div className="success-icon">
+                  <FaCheckCircle size={100} />
+                </div>
+                <h1 className="success-title">Payment Successful!</h1>
+                <p className="success-message">
+                  Thank you for your order. Your payment has been processed successfully.
+                  We'll send you an email with your order details shortly.
+                </p>
+                <div className="success-buttons d-grid gap-3">
+                  <Link to="/menu" className="text-decoration-none">
+                    <Button className="btn-continue w-100 d-flex align-items-center justify-content-center gap-2">
+                      <FaShoppingBag />
+                      Continue Shopping
+                    </Button>
+                  </Link>
+                  <Link to="/orders" className="text-decoration-none">
+                    <Button className="btn-view-orders w-100 d-flex align-items-center justify-content-center gap-2">
+                      <FaClipboardList />
+                      View Orders
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </Card.Body>
           </Card>

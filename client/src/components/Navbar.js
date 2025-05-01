@@ -358,7 +358,6 @@ const Navbar = () => {
                 <NavLinks $isOpen={isMenuOpen}>
                     <NavLink to="/" onClick={() => setIsMenuOpen(false)}>Home</NavLink>
                     <NavLink to="/menu" onClick={() => setIsMenuOpen(false)}>Our Menu</NavLink>
-                    <NavLink to="/foods" onClick={() => setIsMenuOpen(false)}>Foods</NavLink>
                     <NavLink to="/about" onClick={() => setIsMenuOpen(false)}>About us</NavLink>
                     <NavLink to="/contact" onClick={() => setIsMenuOpen(false)}>Contact us</NavLink>
                 </NavLinks>
@@ -372,7 +371,7 @@ const Navbar = () => {
                     </NavLinks>
                 ) : (
                     <LoginButton to="/login" onClick={() => setIsMenuOpen(false)}>Login</LoginButton>
-                )}
+                            )}
             </NavbarContainer>
 
             <AdminLoginModal

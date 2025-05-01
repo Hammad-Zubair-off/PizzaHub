@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchPizzas } from '../actions/pizzaActions';
 import PizzaCard from '../components/PizzaCard';
-import { Row, Col, Container, Alert, Form, Pagination } from 'react-bootstrap';
+import { Row, Col, Container, Alert, Form } from 'react-bootstrap';
 import Loader from '../components/Loader';
 import SearchBar from '../components/SearchBar';
 import styled from 'styled-components';
@@ -191,6 +191,13 @@ const SearchButton = styled.button`
 
 const PizzaGrid = styled(Row)`
   margin-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
 `;
 
 const NoResults = styled(Alert)`
@@ -207,76 +214,35 @@ const NoResults = styled(Alert)`
   }
 `;
 
-const PaginationContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-top: 3rem;
-  margin-bottom: 2rem;
-
-  .pagination {
-    gap: 0.5rem;
-    
-    .page-item {
-      .page-link {
-        border: none;
-        padding: 0.75rem 1rem;
-        border-radius: 12px;
-        color: #666;
-        font-weight: 500;
-        background: white;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-        transition: all 0.3s ease;
-
-        &:hover {
-          background: ${theme.colors.primary}10;
-          color: ${theme.colors.primary};
-        }
-      }
-
-      &.active .page-link {
-        background: ${theme.colors.primary};
-        color: white;
-
-        &:hover {
-          background: ${theme.colors.primary};
-        }
-      }
-
-      &:first-child .page-link,
-      &:last-child .page-link {
-        font-size: 1.1rem;
-        padding: 0.75rem;
-      }
-    }
-  }
-`;
-
 const MenuScreen = () => {
   const dispatch = useDispatch();
   const [category, setCategory] = useState('all');
   const [sort, setSort] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const pizzasPerPage = 12;
 
   const { loading, error, pizzas } = useSelector(state => state.pizzaReducer);
 
-  // Reset search query and page when component mounts
+  // Only fetch on initial load and when filters change
   useEffect(() => {
+    // Reset search when filters change
     setSearchQuery('');
-    setCurrentPage(1);
-  }, []);
+    
+    // Only fetch if we have pizzas in the store
+    if (!pizzas.length) {
+      dispatch(fetchPizzas(category !== 'all' ? category : '', sort));
+    }
+  }, []); // Empty dependency array for initial load only
 
+  // Separate effect for filter changes
   useEffect(() => {
     dispatch(fetchPizzas(category !== 'all' ? category : '', sort));
-  }, [dispatch, category, sort]);
+  }, [category, sort]); // Only re-fetch when filters change
 
   const handleSearch = (query) => {
     setSearchQuery(query);
-    setCurrentPage(1); // Reset to first page on new search
   };
 
-  // Filter pizzas based on search query
+  // Memoize filtered pizzas for better performance
   const filteredPizzas = useMemo(() => {
     if (!searchQuery) return pizzas;
     
@@ -285,60 +251,6 @@ const MenuScreen = () => {
       pizza.name.toLowerCase().includes(query)
     );
   }, [pizzas, searchQuery]);
-
-  // Calculate pagination
-  const indexOfLastPizza = currentPage * pizzasPerPage;
-  const indexOfFirstPizza = indexOfLastPizza - pizzasPerPage;
-  const currentPizzas = filteredPizzas.slice(indexOfFirstPizza, indexOfLastPizza);
-  const totalPages = Math.ceil(filteredPizzas.length / pizzasPerPage);
-
-  // Handle page change
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  // Generate page items
-  const renderPaginationItems = () => {
-    const items = [];
-    
-    // Previous button
-    items.push(
-      <Pagination.Item 
-        key="prev" 
-        onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-        disabled={currentPage === 1}
-      >
-        ←
-      </Pagination.Item>
-    );
-
-    // Page numbers
-    for (let number = 1; number <= totalPages; number++) {
-      items.push(
-        <Pagination.Item
-          key={number}
-          active={number === currentPage}
-          onClick={() => handlePageChange(number)}
-        >
-          {number}
-        </Pagination.Item>
-      );
-    }
-
-    // Next button
-    items.push(
-      <Pagination.Item 
-        key="next"
-        onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-        disabled={currentPage === totalPages}
-      >
-        →
-      </Pagination.Item>
-    );
-
-    return items;
-  };
 
   return (
     <MenuSection>
@@ -392,38 +304,30 @@ const MenuScreen = () => {
           </FilterRow>
         </FiltersContainer>
 
-        {loading ? (
-          <Loader />
-        ) : error ? (
-          <Alert variant="danger">{error}</Alert>
-        ) : (
-          <>
-            <PizzaGrid>
-              {currentPizzas.map(pizza => (
-                <Col key={pizza._id} xs={12} sm={6} lg={4} className="mb-4">
-                  <PizzaCard pizza={pizza} />
-                </Col>
-              ))}
-              {currentPizzas.length === 0 && (
-                <Col xs={12}>
-                  <NoResults variant="info">
-                    {searchQuery ? (
-                      <>No pizzas found matching <strong>"{searchQuery}"</strong>.</>
-                    ) : (
-                      'No pizzas found. Try adjusting your filters.'
-                    )}
-                  </NoResults>
-                </Col>
-              )}
-            </PizzaGrid>
-            
-            {filteredPizzas.length > pizzasPerPage && (
-              <PaginationContainer>
-                <Pagination>{renderPaginationItems()}</Pagination>
-              </PaginationContainer>
-            )}
-          </>
-        )}
+      {loading ? (
+        <Loader />
+      ) : error ? (
+        <Alert variant="danger">{error}</Alert>
+      ) : (
+          <PizzaGrid>
+          {filteredPizzas.map(pizza => (
+              <div key={pizza._id}>
+              <PizzaCard pizza={pizza} />
+              </div>
+          ))}
+          {filteredPizzas.length === 0 && (
+              <div className="col-12">
+                <NoResults variant="info">
+                  {searchQuery ? (
+                    <>No pizzas found matching <strong>"{searchQuery}"</strong>.</>
+                  ) : (
+                    'No pizzas found. Try adjusting your filters.'
+                  )}
+                </NoResults>
+              </div>
+          )}
+          </PizzaGrid>
+      )}
       </MenuContainer>
     </MenuSection>
   );

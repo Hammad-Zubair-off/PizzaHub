@@ -28,7 +28,7 @@ const StyledCard = styled(Card)`
 
 const ImageWrapper = styled.div`
   position: relative;
-  padding-top: 75%;
+  padding-top: 65%;
   overflow: hidden;
   background: #f8f8f8;
 
@@ -62,32 +62,35 @@ const CategoryBadge = styled(Badge)`
   position: absolute;
   top: 1rem;
   left: 1rem;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
+  padding: 0.4rem 0.8rem;
+  border-radius: 15px;
   font-size: 0.7rem;
   font-weight: 600;
   z-index: 2;
   background: ${props => props.bg === 'success' 
-    ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.95), rgba(6, 148, 162, 0.95))'
-    : 'linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(248, 113, 113, 0.95))'
+    ? 'linear-gradient(135deg, #22c55e, #10b981)'
+    : 'linear-gradient(135deg, #ef4444, #f87171)'
   };
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(8px);
-  box-shadow: 0 4px 12px ${props => props.bg === 'success' 
-    ? 'rgba(16, 185, 129, 0.2)'
-    : 'rgba(239, 68, 68, 0.2)'
+  box-shadow: 0 2px 8px ${props => props.bg === 'success' 
+    ? 'rgba(16, 185, 129, 0.15)'
+    : 'rgba(239, 68, 68, 0.15)'
   };
   letter-spacing: 0.5px;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.3rem;
   text-transform: uppercase;
   font-family: 'Nunito', sans-serif;
   transition: all 0.3s ease;
 
-  
   ${StyledCard}:hover & {
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px ${props => props.bg === 'success' 
+      ? 'rgba(16, 185, 129, 0.2)'
+      : 'rgba(239, 68, 68, 0.2)'
+    };
   }
 `;
 
@@ -95,40 +98,39 @@ const PopularBadge = styled(Badge)`
   position: absolute;
   top: 1rem;
   right: 1rem;
-  padding: 0.5rem 1rem;
-  border-radius: 30px;
+  padding: 0.4rem 0.8rem;
+  border-radius: 15px;
   font-size: 0.7rem;
   font-weight: 600;
   z-index: 2;
-  background: linear-gradient(135deg, rgba(255, 158, 12, 0.95), rgba(255, 126, 0, 0.95));
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, #fb923c, #f97316);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(8px);
-  box-shadow: 0 4px 12px rgba(255, 158, 12, 0.2);
+  box-shadow: 0 2px 8px rgba(251, 146, 60, 0.15);
   letter-spacing: 0.5px;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.3rem;
   text-transform: uppercase;
   font-family: 'Nunito', sans-serif;
   transition: all 0.3s ease;
 
-  
-
   ${StyledCard}:hover & {
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(251, 146, 60, 0.2);
   }
 `;
 
 const CardContent = styled(Card.Body)`
-  padding: 1.5rem;
+  padding: 1.25rem;
   background: linear-gradient(to bottom, #ffffff, #fafafa);
 `;
 
 const Title = styled.h3`
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: #2d3748;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
   font-family: 'Nunito', sans-serif;
   
   ${StyledCard}:hover & {
@@ -139,25 +141,26 @@ const Title = styled.h3`
 const MetaInfo = styled.div`
   display: flex;
   align-items: center;
-  gap: 1.1rem;
-  margin-bottom: 0.75rem;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
   color: #718096;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 500;
 
   svg {
     color: ${theme.colors.primary};
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
 `;
 
 const SpiceLevel = styled.div`
   display: flex;
   gap: 0.25rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
 
   svg {
     color: #EF4444;
+    font-size: 0.9rem;
     transition: all 0.3s ease;
     
     ${StyledCard}:hover & {
@@ -168,9 +171,9 @@ const SpiceLevel = styled.div`
 
 const Description = styled.p`
   color: #718096;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  margin-bottom: 1.15rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -178,7 +181,7 @@ const Description = styled.p`
 `;
 
 const PriceTag = styled.div`
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: ${theme.colors.primary};
   font-family: 'Nunito', sans-serif;
@@ -369,7 +372,7 @@ const PizzaCard = ({ pizza }) => {
                 <ImageWrapper>
                     <StyledImage src={pizza.image} alt={pizza.name} />
                     <CategoryBadge 
-                        bg={pizza.category === 'Veg' ? 'success' : 'danger'}
+                        bg={pizza.category === 'Veg' ? 'success' : 'danger'} 
                     >
                         {pizza.category}
                     </CategoryBadge>
@@ -437,7 +440,7 @@ const PizzaCard = ({ pizza }) => {
                                 <div>
                                     <FaStar /> {pizza.rating}
                                 </div>
-                                <div>
+                                    <div>
                                     <FaClock /> {pizza.cookingTime} min
                                 </div>
                             </MetaInfo>

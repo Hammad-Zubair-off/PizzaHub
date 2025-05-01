@@ -140,7 +140,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-        console.log(email, password);
+        console.log(email, "neechey");
         // Input validation
         if (!email || !password) {
             return res.status(400).json({ 

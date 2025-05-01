@@ -1,98 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import FormInput from '../components/FormInput';
+import { Spinner, Badge } from 'react-bootstrap';
+import { FaUser, FaShoppingBag, FaClock, FaCheck, FaCalendar, FaPizzaSlice } from 'react-icons/fa';
+import '../styles/ProfileScreen.css';
 
 export default function ProfileScreen() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
-  const [formData, setFormData] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  });
-  const [formErrors, setFormErrors] = useState({});
-  const [successMessage, setSuccessMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-    
-    // Clear error when user starts typing
-    if (formErrors[name]) {
-      setFormErrors({ ...formErrors, [name]: '' });
-    }
-    
-    // Clear messages
-    setSuccessMessage('');
-    setErrorMessage('');
-  };
-
-  const validateForm = () => {
-    const errors = {};
-    
-    if (!formData.name) {
-      errors.name = 'Name is required';
-    }
-    
-    if (!formData.email) {
-      errors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = 'Email is invalid';
-    }
-    
-    // Only validate password fields if any of them are filled
-    if (formData.currentPassword || formData.newPassword || formData.confirmPassword) {
-      if (!formData.currentPassword) {
-        errors.currentPassword = 'Current password is required';
-      }
-      
-      if (!formData.newPassword) {
-        errors.newPassword = 'New password is required';
-      } else if (formData.newPassword.length < 6) {
-        errors.newPassword = 'Password must be at least 6 characters';
-      }
-      
-      if (!formData.confirmPassword) {
-        errors.confirmPassword = 'Confirm password is required';
-      } else if (formData.newPassword !== formData.confirmPassword) {
-        errors.confirmPassword = 'Passwords do not match';
-      }
-    }
-    
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-    
-    try {
-      // In a real app, you would make an API call to update the user profile
-      // For now, we'll just show a success message
-      setSuccessMessage('Profile updated successfully!');
-      
-      // Clear password fields
-      setFormData({
-        ...formData,
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      });
-    } catch (error) {
-      setErrorMessage(error.message || 'Failed to update profile');
-    }
-  };
 
   if (loading) {
-    return <div className="text-center mt-5">Loading...</div>;
+    return (
+      <div className="profile-container d-flex justify-content-center align-items-center">
+        <Spinner animation="border" variant="primary" />
+      </div>
+    );
   }
 
   if (!user) {
@@ -100,91 +22,166 @@ export default function ProfileScreen() {
     return null;
   }
 
+  const getInitials = (name) => {
+    return name
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase();
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(price);
+  };
+
+  const getOrderStatus = (status) => {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return <Badge bg="warning">Pending</Badge>;
+      case 'processing':
+        return <Badge bg="info">Processing</Badge>;
+      case 'completed':
+        return <Badge bg="success">Completed</Badge>;
+      case 'cancelled':
+        return <Badge bg="danger">Cancelled</Badge>;
+      default:
+        return <Badge bg="secondary">{status}</Badge>;
+    }
+  };
+
+  const pendingOrders = user.orders?.filter(order => 
+    ['pending', 'processing'].includes(order.status.toLowerCase())) || [];
+  
+  const completedOrders = user.orders?.filter(order => 
+    order.status.toLowerCase() === 'completed') || [];
+
   return (
-    <div className="container" style={{ backgroundColor: 'transparent' }}>
-      <div className="row">
-        <div className="col-sm-9 col-md-7 col-lg-5 mx-auto">
-          <div className="card border-0 shadow rounded-3 my-5">
+    <div className="profile-container">
+      <div className="row justify-content-center w-100">
+        <div className="col-lg-8">
+          <div className="profile-card">
             <div className="card-body p-4 p-sm-5">
-              <h5 className="card-title text-center mb-5 fw-light fs-5">Your Profile</h5>
+              <div className="profile-header">
+                <div className="profile-avatar">
+                  {getInitials(user.name)}
+                </div>
+                <h1 className="profile-title">Welcome, {user.name}!</h1>
+                <p className="profile-subtitle">
+                  Member since {formatDate(user.createdAt)}
+                </p>
+              </div>
               
-              {successMessage && (
-                <div className="alert alert-success" role="alert">
-                  {successMessage}
+              <div className="orders-section">
+                <div className="section-header">
+                  <h2>
+                    <FaShoppingBag className="section-icon" />
+                    Order History
+                  </h2>
+                </div>
+
+                {/* Pending Orders */}
+                <div className="order-category">
+                  <h3>
+                    <FaClock className="category-icon" />
+                    Pending Orders ({pendingOrders.length})
+                  </h3>
+                  {pendingOrders.length === 0 ? (
+                    <p className="no-orders">No pending orders</p>
+                  ) : (
+                    <div className="orders-list">
+                      {pendingOrders.map(order => (
+                        <div key={order._id} className="order-card">
+                          <div className="order-header">
+                            <div className="order-id">
+                              Order #{order._id.slice(-6)}
+                            </div>
+                            {getOrderStatus(order.status)}
+                          </div>
+                          <div className="order-details">
+                            <div className="order-info">
+                              <FaCalendar className="info-icon" />
+                              {formatDate(order.createdAt)}
+                            </div>
+                            <div className="order-info">
+                              <FaPizzaSlice className="info-icon" />
+                              {order.items.length} items
+                            </div>
+                            <div className="order-total">
+                              {formatPrice(order.totalAmount)}
+                            </div>
+                          </div>
+                          <div className="order-items">
+                            {order.items.map((item, index) => (
+                              <div key={index} className="order-item">
+                                <span className="item-name">{item.name}</span>
+                                <span className="item-quantity">x{item.quantity}</span>
+                                <span className="item-price">{formatPrice(item.price)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
                 </div>
               )}
-              
-              {errorMessage && (
-                <div className="alert alert-danger" role="alert">
-                  {errorMessage}
+                </div>
+
+                {/* Completed Orders */}
+                <div className="order-category">
+                  <h3>
+                    <FaCheck className="category-icon" />
+                    Completed Orders ({completedOrders.length})
+                  </h3>
+                  {completedOrders.length === 0 ? (
+                    <p className="no-orders">No completed orders</p>
+                  ) : (
+                    <div className="orders-list">
+                      {completedOrders.map(order => (
+                        <div key={order._id} className="order-card">
+                          <div className="order-header">
+                            <div className="order-id">
+                              Order #{order._id.slice(-6)}
+                            </div>
+                            {getOrderStatus(order.status)}
+                          </div>
+                          <div className="order-details">
+                            <div className="order-info">
+                              <FaCalendar className="info-icon" />
+                              {formatDate(order.createdAt)}
+                            </div>
+                            <div className="order-info">
+                              <FaPizzaSlice className="info-icon" />
+                              {order.items.length} items
+                            </div>
+                            <div className="order-total">
+                              {formatPrice(order.totalAmount)}
+                            </div>
+                          </div>
+                          <div className="order-items">
+                            {order.items.map((item, index) => (
+                              <div key={index} className="order-item">
+                                <span className="item-name">{item.name}</span>
+                                <span className="item-quantity">x{item.quantity}</span>
+                                <span className="item-price">{formatPrice(item.price)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
                 </div>
               )}
-              
-              <form onSubmit={handleSubmit}>
-                <FormInput
-                  label="Full Name"
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="John Doe"
-                  required
-                  error={formErrors.name}
-                />
-                
-                <FormInput
-                  label="Email Address"
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="name@example.com"
-                  required
-                  error={formErrors.email}
-                />
-                
-                <hr className="my-4" />
-                <h6 className="text-center mb-3">Change Password (Optional)</h6>
-                
-                <FormInput
-                  label="Current Password"
-                  type="password"
-                  name="currentPassword"
-                  value={formData.currentPassword}
-                  onChange={handleChange}
-                  placeholder="Current Password"
-                  error={formErrors.currentPassword}
-                />
-                
-                <FormInput
-                  label="New Password"
-                  type="password"
-                  name="newPassword"
-                  value={formData.newPassword}
-                  onChange={handleChange}
-                  placeholder="New Password"
-                  error={formErrors.newPassword}
-                />
-                
-                <FormInput
-                  label="Confirm New Password"
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="Confirm New Password"
-                  error={formErrors.confirmPassword}
-                />
-                
-                <div className="d-grid mt-4">
-                  <button 
-                    className="btn btn-primary btn-login text-uppercase fw-bold" 
-                    type="submit"
-                  >
-                    Update Profile
-                  </button>
                 </div>
-              </form>
+              </div>
             </div>
           </div>
         </div>

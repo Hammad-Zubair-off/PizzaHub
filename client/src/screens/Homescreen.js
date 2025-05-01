@@ -826,12 +826,12 @@ const { loading, error, pizzas = [] } = pizzaState || { loading: false, error: n
             <li>Is Pizzas Array: {String(Array.isArray(pizzas))}</li>
             <li>Pizzas Length: {String(pizzas?.length)}</li>
           </ul>
-        </div>
+      </div>
 
         {loading ? (
           <>
             <div>Loading state is true, showing loader</div>
-            <Loader />
+          <Loader />
           </>
         ) : error ? (
           <>
@@ -896,7 +896,7 @@ const { loading, error, pizzas = [] } = pizzaState || { loading: false, error: n
                 <path d="M3.33337 8H12.6667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M8 3.33337L12.6667 8.00004L8 12.6667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-            </Link>
+        </Link>
           </FeatureCard>
         ))}
       </FeaturesSection>
