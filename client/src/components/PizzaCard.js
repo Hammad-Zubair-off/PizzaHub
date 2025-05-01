@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, Badge, Modal, Row, Col, Form } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { addToCart } from '../actions/cartActions';
 import { addToCart as addToCartRedux } from '../reducers/cartReducer';
 import { toast } from 'react-toastify';
@@ -9,8 +9,6 @@ import styled from 'styled-components';
 import { theme } from '../styles/theme';
 import { FaStar, FaClock, FaPepperHot, FaShoppingCart } from 'react-icons/fa';
 import { ToastContainer } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
-
 
 const StyledCard = styled(Card)`
   border: none;
@@ -362,35 +360,12 @@ const PizzaCard = ({ pizza }) => {
     const [selectedVarient, setSelectedVarient] = useState(pizza.varients[0]);
     const [quantity, setQuantity] = useState(1);
     const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const { userInfo } = useSelector(state => state.userLogin || {});
-
-
-    // const handleAddToCart = (item) => {
-        
-    //     dispatch(addToCartRedux(item._id, quantity, selectedVarient));
-    //     toast.success('Product added to cart!');
-    // };
 
     const handleAddToCart = (item) => {
-      // Check if user is logged in
-      if (!userInfo) {
-          // If not logged in, close the modal and redirect to login page
-          setModalShow(false);
-          toast.warning('Please login to add items to your cart');
-          
-          // Save the current URL to redirect back after login
-          localStorage.setItem('redirectAfterLogin', window.location.pathname);
-          
-          // Redirect to login page
-          navigate('/login');
-          return;
-      }
-      
-      // If user is logged in, proceed with adding to cart
-      dispatch(addToCartRedux(item._id, quantity, selectedVarient));
-      toast.success('Product added to cart!');
-  };
+        
+        dispatch(addToCartRedux(item._id, quantity, selectedVarient));
+        toast.success('Product added to cart!');
+    };
 
     const getPrice = (varient) => {
         return pizza.prices.find(p => p.varient === varient)?.price || 0;
