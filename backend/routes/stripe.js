@@ -7,13 +7,15 @@ const jwt = require('jsonwebtoken');
 dotenv.config();
 
 // Initialize Stripe with the secret key from environment variables
+if (!process.env.STRIPE_SECRET_KEY) {
+    console.error('Stripe secret key is not set in environment variables');
+    throw new Error('Stripe secret key is required');
+}
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 router.post('/create-checkout-session', async (req, res) => {
   try {
-    // Log the secret key for debugging (remove in production)
-    console.log('Using Stripe secret key:', process.env.STRIPE_SECRET_KEY);
-    
     const { cartItems, shippingAddress } = req.body;
     if (!cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
       return res.status(400).json({ error: 'No cart items provided' });
@@ -54,7 +56,7 @@ router.post('/create-checkout-session', async (req, res) => {
 
     // Create order in database first
     const order = new Order({
-      user: userId, // Use actual user ID if available
+      user: userId,
       items: cartItems.map(item => ({
         pizza: item._id,
         quantity: item.quantity,
@@ -79,8 +81,8 @@ router.post('/create-checkout-session', async (req, res) => {
         allowed_countries: ['PK'], // Only allow Pakistan
       },
       metadata: {
-        order_id: order._id.toString(), // Use the actual MongoDB order ID
-        user_id: userId // Include user ID in metadata
+        order_id: order._id.toString(),
+        user_id: userId
       },
     });
 
@@ -90,7 +92,11 @@ router.post('/create-checkout-session', async (req, res) => {
     });
   } catch (error) {
     console.error('Stripe session error:', error);
-    res.status(500).json({ error: error.message || 'Stripe session creation failed' });
+    // Send more detailed error information in development
+    const errorMessage = process.env.NODE_ENV === 'development' 
+      ? error.message 
+      : 'Failed to create checkout session';
+    res.status(500).json({ error: errorMessage });
   }
 });
 

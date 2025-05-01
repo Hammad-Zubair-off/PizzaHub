@@ -2,21 +2,269 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchPizzas } from '../actions/pizzaActions';
 import PizzaCard from '../components/PizzaCard';
-import { Row, Col, Container, Alert, Form } from 'react-bootstrap';
+import { Row, Col, Container, Alert, Form, Pagination } from 'react-bootstrap';
 import Loader from '../components/Loader';
 import SearchBar from '../components/SearchBar';
+import styled from 'styled-components';
+import { theme } from '../styles/theme';
+import { FaFilter, FaSort, FaSearch } from 'react-icons/fa';
+
+const MenuSection = styled.section`
+  background-color: #FFF8F3;
+  min-height: 100vh;
+  width: 100%;
+`;
+
+const MenuContainer = styled(Container)`
+  padding: 3rem 1.5rem;
+  
+  @media (min-width: 768px) {
+    padding: 4rem 2rem;
+  }
+`;
+
+const MenuHeader = styled.div`
+  margin-bottom: 3.5rem;
+  text-align: center;
+`;
+
+const MenuTitle = styled.h1`
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  
+  @media (min-width: 768px) {
+    font-size: 3rem;
+  }
+
+  span {
+    color: ${theme.colors.primary};
+  }
+`;
+
+const MenuDescription = styled.p`
+  color: #666;
+  max-width: 600px;
+  margin: 0 auto;
+  font-size: 1.1rem;
+  line-height: 1.6;
+`;
+
+const FiltersContainer = styled.div`
+  background: white;
+  padding: 1.25rem;
+  border-radius: 16px;
+  box-shadow: ${theme.shadows.default};
+  margin-bottom: 3rem;
+`;
+
+const FilterRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: nowrap;
+
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+`;
+
+const FilterGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 200px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+
+  label {
+    font-weight: 600;
+    color: #444;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+
+    svg {
+      margin-right: 0.5rem;
+      color: ${theme.colors.primary};
+      font-size: 0.9rem;
+    }
+  }
+
+  select {
+    flex: 1;
+    border-radius: 12px;
+    border: 2px solid #eee;
+    padding: 0.6rem 2rem 0.6rem 1rem;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background-color: white;
+    color: #444;
+    font-weight: 500;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 0.8em;
+    min-width: 120px;
+
+    &:hover {
+      border-color: ${theme.colors.primary}50;
+    }
+
+    &:focus {
+      border-color: ${theme.colors.primary};
+      box-shadow: 0 0 0 3px ${theme.colors.primary}15;
+      outline: none;
+    }
+  }
+`;
+
+const SearchContainer = styled.div`
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+
+  .form-control {
+    border-radius: 12px;
+    border: 2px solid #eee;
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    width: 100%;
+    
+    &::placeholder {
+      color: #999;
+      font-weight: 400;
+    }
+
+    &:hover {
+      border-color: ${theme.colors.primary}50;
+    }
+
+    &:focus {
+      border-color: ${theme.colors.primary};
+      box-shadow: 0 0 0 3px ${theme.colors.primary}15;
+    }
+  }
+`;
+
+const SearchButton = styled.button`
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: ${theme.colors.primary};
+  border: none;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: ${theme.colors.secondary};
+  }
+
+  svg {
+    font-size: 0.9rem;
+  }
+`;
+
+const PizzaGrid = styled(Row)`
+  margin-top: 2rem;
+`;
+
+const NoResults = styled(Alert)`
+  text-align: center;
+  padding: 2rem;
+  background-color: #f8f9fa;
+  border: none;
+  border-radius: 12px;
+  color: #666;
+  font-size: 1.1rem;
+
+  strong {
+    color: ${theme.colors.primary};
+  }
+`;
+
+const PaginationContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 3rem;
+  margin-bottom: 2rem;
+
+  .pagination {
+    gap: 0.5rem;
+    
+    .page-item {
+      .page-link {
+        border: none;
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        color: #666;
+        font-weight: 500;
+        background: white;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: ${theme.colors.primary}10;
+          color: ${theme.colors.primary};
+        }
+      }
+
+      &.active .page-link {
+        background: ${theme.colors.primary};
+        color: white;
+
+        &:hover {
+          background: ${theme.colors.primary};
+        }
+      }
+
+      &:first-child .page-link,
+      &:last-child .page-link {
+        font-size: 1.1rem;
+        padding: 0.75rem;
+      }
+    }
+  }
+`;
 
 const MenuScreen = () => {
   const dispatch = useDispatch();
   const [category, setCategory] = useState('all');
   const [sort, setSort] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const pizzasPerPage = 12;
 
   const { loading, error, pizzas } = useSelector(state => state.pizzaReducer);
 
-  // Reset search query when component mounts
+  // Reset search query and page when component mounts
   useEffect(() => {
     setSearchQuery('');
+    setCurrentPage(1);
   }, []);
 
   useEffect(() => {
@@ -25,9 +273,10 @@ const MenuScreen = () => {
 
   const handleSearch = (query) => {
     setSearchQuery(query);
+    setCurrentPage(1); // Reset to first page on new search
   };
 
-  // Use useMemo to optimize filtering performance - ONLY search by name
+  // Filter pizzas based on search query
   const filteredPizzas = useMemo(() => {
     if (!searchQuery) return pizzas;
     
@@ -37,24 +286,77 @@ const MenuScreen = () => {
     );
   }, [pizzas, searchQuery]);
 
+  // Calculate pagination
+  const indexOfLastPizza = currentPage * pizzasPerPage;
+  const indexOfFirstPizza = indexOfLastPizza - pizzasPerPage;
+  const currentPizzas = filteredPizzas.slice(indexOfFirstPizza, indexOfLastPizza);
+  const totalPages = Math.ceil(filteredPizzas.length / pizzasPerPage);
+
+  // Handle page change
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Generate page items
+  const renderPaginationItems = () => {
+    const items = [];
+    
+    // Previous button
+    items.push(
+      <Pagination.Item 
+        key="prev" 
+        onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+        disabled={currentPage === 1}
+      >
+        ←
+      </Pagination.Item>
+    );
+
+    // Page numbers
+    for (let number = 1; number <= totalPages; number++) {
+      items.push(
+        <Pagination.Item
+          key={number}
+          active={number === currentPage}
+          onClick={() => handlePageChange(number)}
+        >
+          {number}
+        </Pagination.Item>
+      );
+    }
+
+    // Next button
+    items.push(
+      <Pagination.Item 
+        key="next"
+        onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+        disabled={currentPage === totalPages}
+      >
+        →
+      </Pagination.Item>
+    );
+
+    return items;
+  };
+
   return (
-    <Container className="py-5">
-      <Row className="my-4">
-        <Col md={8}>
-          <h2>Our Menu</h2>
-        </Col>
-        <Col md={4}>
-          <SearchBar 
-            onSearch={handleSearch} 
-            suggestions={pizzas} 
-          />
-        </Col>
-      </Row>
-      <div className="filters mb-4">
-        <Row className="align-items-center">
-          <Col md={6} lg={3}>
-            <Form.Group>
-              <Form.Label>Category</Form.Label>
+    <MenuSection>
+      <MenuContainer>
+        <MenuHeader>
+          <MenuTitle>Our <span>Menu</span></MenuTitle>
+          <MenuDescription>
+            Discover our handcrafted pizzas made with fresh ingredients and baked to perfection
+          </MenuDescription>
+        </MenuHeader>
+
+        <FiltersContainer>
+          <FilterRow>
+            <FilterGroup>
+              <Form.Label>
+                <FaFilter />
+                Category
+              </Form.Label>
               <Form.Select 
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
@@ -63,11 +365,13 @@ const MenuScreen = () => {
                 <option value="veg">Vegetarian</option>
                 <option value="non-veg">Non-Vegetarian</option>
               </Form.Select>
-            </Form.Group>
-          </Col>
-          <Col md={6} lg={3}>
-            <Form.Group>
-              <Form.Label>Sort By</Form.Label>
+            </FilterGroup>
+
+            <FilterGroup>
+              <Form.Label>
+                <FaSort />
+                Sort By
+              </Form.Label>
               <Form.Select
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
@@ -76,32 +380,52 @@ const MenuScreen = () => {
                 <option value="popular">Most Popular</option>
                 <option value="rating">Top Rated</option>
               </Form.Select>
-            </Form.Group>
-          </Col>
-        </Row>
-      </div>
+            </FilterGroup>
 
-      {loading ? (
-        <Loader />
-      ) : error ? (
-        <Alert variant="danger">{error}</Alert>
-      ) : (
-        <Row>
-          {filteredPizzas.map(pizza => (
-            <Col key={pizza._id} xs={12} sm={6} lg={4} className="mb-4">
-              <PizzaCard pizza={pizza} />
-            </Col>
-          ))}
-          {filteredPizzas.length === 0 && (
-            <Col xs={12}>
-              <Alert variant="info">
-                {searchQuery ? `No pizzas found matching "${searchQuery}".` : 'No pizzas found. Try adjusting your filters.'}
-              </Alert>
-            </Col>
-          )}
-        </Row>
-      )}
-    </Container>
+            <SearchContainer>
+              <SearchBar 
+                onSearch={handleSearch} 
+                suggestions={pizzas} 
+              />
+              
+            </SearchContainer>
+          </FilterRow>
+        </FiltersContainer>
+
+        {loading ? (
+          <Loader />
+        ) : error ? (
+          <Alert variant="danger">{error}</Alert>
+        ) : (
+          <>
+            <PizzaGrid>
+              {currentPizzas.map(pizza => (
+                <Col key={pizza._id} xs={12} sm={6} lg={4} className="mb-4">
+                  <PizzaCard pizza={pizza} />
+                </Col>
+              ))}
+              {currentPizzas.length === 0 && (
+                <Col xs={12}>
+                  <NoResults variant="info">
+                    {searchQuery ? (
+                      <>No pizzas found matching <strong>"{searchQuery}"</strong>.</>
+                    ) : (
+                      'No pizzas found. Try adjusting your filters.'
+                    )}
+                  </NoResults>
+                </Col>
+              )}
+            </PizzaGrid>
+            
+            {filteredPizzas.length > pizzasPerPage && (
+              <PaginationContainer>
+                <Pagination>{renderPaginationItems()}</Pagination>
+              </PaginationContainer>
+            )}
+          </>
+        )}
+      </MenuContainer>
+    </MenuSection>
   );
 };
 

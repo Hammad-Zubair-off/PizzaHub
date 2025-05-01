@@ -5,10 +5,10 @@ import { Button, Spinner, Form } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { loadStripe } from '@stripe/stripe-js';
-import { clearCart } from '../actions/cartActions';
+import axiosInstance from '../shared/axiosInstance';
 
 // Initialize Stripe with the publishable key
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY || 'pk_test_51REHrHH0xzDgBkN3jfhb6Ff0mrC4tZMqP2GXYlEmVHr6iyFMv0W2uG88VXOJimnuppdaRVB9MnVDrfAtHL5bfiIP00eOa7M9GF');
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
 
 const ProceedToCheckout = () => {
     const navigate = useNavigate();
@@ -26,7 +26,7 @@ const ProceedToCheckout = () => {
     const { cartItems } = cart;
 
     const calculateSubtotal = () => {
-        return cartItems.reduce((total, item) => total + item.totalPrice, 0);
+        return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     };
 
     const handleAddressChange = (e) => {
@@ -56,47 +56,36 @@ const ProceedToCheckout = () => {
             // Load Stripe
             const stripe = await stripePromise;
             if (!stripe) {
-                throw new Error('Failed to load Stripe');
+                throw new Error('Failed to load Stripe. Please check your Stripe publishable key.');
             }
 
-            // Create checkout session
-            const response = await fetch('/api/stripe/create-checkout-session', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify({ 
-                    cartItems,
-                    shippingAddress
-                }),
+            // Create checkout session using axiosInstance
+            const response = await axiosInstance.post('stripe/create-checkout-session', {
+                cartItems: cartItems.map(item => ({
+                    ...item,
+                    name: item.pizza.name,
+                    image: item.pizza.image,
+                    variant: item.size
+                })),
+                shippingAddress
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to create checkout session');
-            }
-
-            const session = await response.json();
-            
-            if (!session.id) {
-                throw new Error('Invalid session response');
+            if (!response.data.id) {
+                throw new Error('Invalid session response from server');
             }
 
             // Redirect to Stripe checkout
-            const result = await stripe.redirectToCheckout({ sessionId: session.id });
+            const result = await stripe.redirectToCheckout({ 
+                sessionId: response.data.id 
+            });
             
             if (result.error) {
                 throw new Error(result.error.message);
             }
-
-            // Clear cart after successful checkout initiation
-            dispatch(clearCart());
             
         } catch (error) {
             console.error('Checkout error:', error);
-            toast.error(`Checkout failed: ${error.message}`);
-        } finally {
+            toast.error(`Checkout failed: ${error.response?.data?.error || error.message}`);
             setLoading(false);
         }
     };

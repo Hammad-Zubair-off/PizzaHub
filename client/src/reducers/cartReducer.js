@@ -29,11 +29,21 @@ const cartSlice = createSlice({
         clearCart: (state) => {
             state.cartItems = [];
             state.error = null;
+        },
+        updateCartItem: (state, action) => {
+            const { itemId, quantity } = action.payload;
+            const itemIndex = state.cartItems.findIndex(item => item._id === itemId);
+            if (itemIndex !== -1) {
+                state.cartItems[itemIndex].quantity = quantity;
+            }
+        },
+        removeCartItem: (state, action) => {
+            state.cartItems = state.cartItems.filter(item => item._id !== action.payload);
         }
     }
 });
 
-export const { setCartItems, setLoading, setError, clearCart } = cartSlice.actions;
+export const { setCartItems, setLoading, setError, clearCart, updateCartItem, removeCartItem } = cartSlice.actions;
 
 // Async Actions
 export const fetchCartItems = () => async (dispatch) => {
@@ -41,7 +51,7 @@ export const fetchCartItems = () => async (dispatch) => {
         dispatch(setLoading(true));
         const token = localStorage.getItem('token');
 
-        const response = await axios.get('/api/cart', {
+        const response = await axiosInstance.get('/cart', {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -56,10 +66,7 @@ export const fetchCartItems = () => async (dispatch) => {
 
 export const addToCart = (pizzaId, quantity, size) => async (dispatch) => {
     try {
-        console.log(pizzaId, quantity, size,"pizzaId, quantity, size");
-        dispatch(setLoading(true));
         const response = await axiosInstance.post('cart/add', { pizzaId, quantity, size });
-        console.log(response,"response from add to carts");
         dispatch(setCartItems(response.data.cartItems));
         toast.success('Item added to cart');
     } catch (error) {
@@ -70,11 +77,16 @@ export const addToCart = (pizzaId, quantity, size) => async (dispatch) => {
 
 export const removeFromCart = (itemId) => async (dispatch) => {
     try {
-        dispatch(setLoading(true));
+        // Optimistically update UI
+        dispatch(removeCartItem(itemId));
+        
         const response = await axiosInstance.delete(`cart/remove/${itemId}`);
+        // Update with server response
         dispatch(setCartItems(response.data.cartItems));
         toast.success('Item removed from cart');
     } catch (error) {
+        // Revert on error
+        dispatch(fetchCartItems());
         dispatch(setError(error.response?.data?.message || 'Failed to remove item from cart'));
         toast.error('Failed to remove item from cart');
     }
@@ -82,10 +94,15 @@ export const removeFromCart = (itemId) => async (dispatch) => {
 
 export const updateCartItemQuantity = (itemId, quantity) => async (dispatch) => {
     try {
-        dispatch(setLoading(true));
+        // Optimistically update UI
+        dispatch(updateCartItem({ itemId, quantity }));
+        
         const response = await axiosInstance.put(`cart/update/${itemId}`, { quantity });
+        // Update with server response
         dispatch(setCartItems(response.data.cartItems));
     } catch (error) {
+        // Revert on error
+        dispatch(fetchCartItems());
         dispatch(setError(error.response?.data?.message || 'Failed to update cart item'));
         toast.error('Failed to update cart item');
     }
@@ -93,11 +110,14 @@ export const updateCartItemQuantity = (itemId, quantity) => async (dispatch) => 
 
 export const clearCartItems = () => async (dispatch) => {
     try {
-        dispatch(setLoading(true));
-        await axiosInstance.delete('cart/clear');
+        // Optimistically clear cart
         dispatch(clearCart());
+        
+        await axiosInstance.delete('cart/clear');
         toast.success('Cart cleared successfully');
     } catch (error) {
+        // Revert on error
+        dispatch(fetchCartItems());
         dispatch(setError(error.response?.data?.message || 'Failed to clear cart'));
         toast.error('Failed to clear cart');
     }

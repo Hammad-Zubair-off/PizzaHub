@@ -10,6 +10,7 @@ import {
 import { Button, Container, Table, Form, Row, Col, Card } from 'react-bootstrap';
 import { FaTrash, FaPlus, FaMinus } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
+import ProceedToCheckout from '../components/ProceedToCheckout';
 
 const Cartscreen = () => {
     const dispatch = useDispatch();
@@ -43,7 +44,8 @@ const Cartscreen = () => {
         return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     };
 
-    if (loading) {
+    // Only show loading state during initial fetch
+    if (loading && cartItems.length === 0) {
         return (
             <Container className="py-5">
                 <div className="text-center">
@@ -154,28 +156,7 @@ const Cartscreen = () => {
                             </Button>
                         </Col>
                         <Col md={6}>
-                            <Card className="p-3">
-                                <h4>Order Summary</h4>
-                                <div className="d-flex justify-content-between mb-2">
-                                    <span>Subtotal:</span>
-                                    <span>${calculateSubtotal().toFixed(2)}</span>
-                                </div>
-                                <div className="d-flex justify-content-between mb-2">
-                                    <span>Tax (10%):</span>
-                                    <span>${(calculateSubtotal() * 0.1).toFixed(2)}</span>
-                                </div>
-                                <div className="d-flex justify-content-between mb-3">
-                                    <strong>Total:</strong>
-                                    <strong>${(calculateSubtotal() * 1.1).toFixed(2)}</strong>
-                                </div>
-                                <Button 
-                                    variant="primary" 
-                                    className="w-100"
-                                    onClick={() => navigate('/checkout')}
-                                >
-                                    Proceed to Checkout
-                                </Button>
-                            </Card>
+                            <ProceedToCheckout />
                         </Col>
                     </Row>
                 </>
