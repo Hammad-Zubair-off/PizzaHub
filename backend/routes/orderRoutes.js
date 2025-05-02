@@ -3,7 +3,6 @@ const router = express.Router();
 const { authenticate } = require('../middleware/authenticate');
 const Order = require('../models/orderModel');
 
-// Create a new order
 router.post('/', authenticate, async (req, res) => {
     try {
         const { items, totalAmount, shippingAddress } = req.body;
@@ -28,7 +27,6 @@ router.post('/', authenticate, async (req, res) => {
     }
 });
 
-// Get user's orders
 router.get('/myorders', authenticate, async (req, res) => {
     try {
         const orders = await Order.find({ user: req.user.id })
@@ -50,7 +48,6 @@ router.get('/myorders', authenticate, async (req, res) => {
     }
 });
 
-// Get all orders (admin only)
 router.get('/all', authenticate, async (req, res) => {
     if (req.user.role !== 'admin') {
         return res.status(403).json({

@@ -64,14 +64,23 @@ export const fetchCartItems = () => async (dispatch) => {
     }
 };
 
-export const addToCart = (pizzaId, quantity, size) => async (dispatch) => {
+export const addToCart = (pizzaId, quantity, size, navigate) => async (dispatch) => {
     try {
+        console.log("CLient Pizzas failed response");
         const response = await axiosInstance.post('cart/add', { pizzaId, quantity, size });
         dispatch(setCartItems(response.data.cartItems));
         toast.success('Item added to cart');
     } catch (error) {
-        dispatch(setError(error.response?.data?.message || 'Failed to add item to cart'));
-        toast.error('Failed to add item to cart');
+        const errorMessage = error.response?.data?.message || 'Failed to add item to cart';
+        
+        // Show toast
+        toast.error('Login First', { autoClose: 2000 });
+        dispatch(setError(errorMessage));
+
+        // Delay 2 seconds (2000ms) then navigate to login
+        setTimeout(() => {
+            navigate('/login');
+        }, 2000);
     }
 };
 

@@ -37,13 +37,13 @@
 ---
 
 ## Overview  
-PizzaHub is a feature-rich pizza ordering application built using the MERN stack. It provides seamless user experience, including user authentication, cart management, and an admin panel for managing products. With Redux for state management and Postman for API testing, the app is designed for efficiency and reliability.
+PizzaHub is a feature-rich food ordering application built using the MERN stack. It provides seamless user experience, including user authentication, cart management, and an admin panel for managing products. With Redux for state management and Postman for API testing, the app is designed for efficiency and reliability.
 
 ---
 
 ## Features  
 - **User Authentication**: Secure login and registration system.  
-- **Dynamic Menu**: Displays a list of pizzas fetched from the backend.  
+- **Dynamic Menu**: Displays a list of foods fetched from the backend.  
 - **Cart Management**: Add/remove items with real-time updates using Redux.  
 - **Admin Panel**: Manage product lists, add/edit products.  
 - **Responsive Design**: Fully responsive for all devices.  

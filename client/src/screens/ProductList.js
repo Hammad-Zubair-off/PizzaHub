@@ -60,7 +60,7 @@ const ProductList = () => {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Product List</h2>
         <button className="btn btn-primary" onClick={handleAddProduct}>
-          Add New Pizza
+          Add New food
         </button>
       </div>
       
@@ -109,7 +109,7 @@ const ProductList = () => {
           </table>
         </div>
       ) : (
-        <div className="alert alert-info">No pizzas found. Add some pizzas to get started!</div>
+        <div className="alert alert-info">No foods found. Add some foods to get started!</div>
       )}
     </div>
   );

@@ -83,7 +83,7 @@ const Loginscreen = () => {
                 <div className="auth-overlay">
                     <div className="auth-content">
                         <h1>Welcome to PizzaHub</h1>
-                        <p>Experience the joy of authentic Italian pizza, made with love and delivered to your doorstep.</p>
+                        <p>Experience the joy of authentic Italian food, made with love and delivered to your doorstep.</p>
                     </div>
                 </div>
             </div>

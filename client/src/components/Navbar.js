@@ -174,7 +174,7 @@ const CategoryFilter = () => (
             Filter
         </Dropdown.Toggle>
         <Dropdown.Menu>
-            <Dropdown.Item as={Link} to="/menu?category=all">All Pizzas</Dropdown.Item>
+            <Dropdown.Item as={Link} to="/menu?category=all">All foods</Dropdown.Item>
             <Dropdown.Item as={Link} to="/menu?category=veg">Veg Only</Dropdown.Item>
             <Dropdown.Item as={Link} to="/menu?category=non-veg">Non-Veg</Dropdown.Item>
             <Dropdown.Divider />

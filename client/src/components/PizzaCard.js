@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { Card, Badge, Modal, Row, Col, Form } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
-import { addToCart } from '../actions/cartActions';
+import { useNavigate } from 'react-router-dom';
 import { addToCart as addToCartRedux } from '../reducers/cartReducer';
-import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import styled from 'styled-components';
 import { theme } from '../styles/theme';
@@ -360,11 +359,12 @@ const PizzaCard = ({ pizza }) => {
     const [selectedVarient, setSelectedVarient] = useState(pizza.varients[0]);
     const [quantity, setQuantity] = useState(1);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+
 
     const handleAddToCart = (item) => {
         
-        dispatch(addToCartRedux(item._id, quantity, selectedVarient));
-        toast.success('Product added to cart!');
+        dispatch(addToCartRedux(item._id, quantity, selectedVarient, navigate));
     };
 
     const getPrice = (varient) => {
@@ -395,7 +395,7 @@ const PizzaCard = ({ pizza }) => {
                 <CardContent>
                     <Title>{pizza.name}</Title>
                     <MetaInfo>
-                        <div>
+                        <div >
                             <FaStar /> {pizza.rating}
                         </div>
                         <div>

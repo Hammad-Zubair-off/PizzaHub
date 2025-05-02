@@ -8,11 +8,7 @@ export default function Pizza({ pizza }) {
     const [varient, setVarient] = useState(pizza.varients ? pizza.varients[0] : '');
     const dispatch = useDispatch();
 
-    // Debug log - remove in production
-    console.log("Pizza data:", pizza);
-    console.log("Selected variant:", varient);
-    console.log("Available variants:", pizza.varients);
-    console.log("Prices:", pizza.prices);
+
 
     // Find the price for the selected variant
     const getPrice = () => {

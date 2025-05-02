@@ -91,7 +91,7 @@ const Registerscreen = () => {
         <div className="auth-overlay">
           <div className="auth-content">
             <h1>Join Our Food Community</h1>
-            <p>Create an account to unlock a world of delicious possibilities. Fresh, hot pizzas are just moments away.</p>
+            <p>Create an account to unlock a world of delicious possibilities. Fresh, hot foods are just moments away.</p>
           </div>
         </div>
       </div>

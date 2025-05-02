@@ -747,7 +747,7 @@ const AdminDashboard = () => {
                 // Close modal and reset form
                 setShowAddModal(false);
                 resetForm();
-                toast.success('Pizza added successfully!');
+                toast.success('food added successfully!');
             }
         } catch (err) {
             console.error('Error adding pizza:', err);
@@ -823,11 +823,11 @@ const AdminDashboard = () => {
                 // Close modal and reset form
                 setShowEditModal(false);
                 resetForm();
-                toast.success('Pizza updated successfully!');
+                toast.success('Food updated successfully!');
             }
         } catch (err) {
-            console.error('Error updating pizza:', err);
-            const errorMessage = err.response?.data?.message || 'Failed to update pizza';
+            console.error('Error updating food:', err);
+            const errorMessage = err.response?.data?.message || 'Failed to update food';
             setFormError(errorMessage);
 
             if (err.response?.status === 401) {
@@ -838,7 +838,7 @@ const AdminDashboard = () => {
 
     // Handle pizza deletion
     const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this pizza?')) {
+        if (window.confirm('Are you sure you want to delete this food?')) {
             try {
                 const token = localStorage.getItem('token');
                 if (!token) {
@@ -858,10 +858,10 @@ const AdminDashboard = () => {
                 // Refresh pizzas list
                 const response = await axios.get('/api/pizzas', { headers });
                 setPizzas(response.data);
-                toast.success('Pizza deleted successfully!');
+                toast.success('food deleted successfully!');
             } catch (err) {
-                console.error('Error deleting pizza:', err);
-                const errorMessage = err.response?.data?.message || 'Failed to delete pizza';
+                console.error('Error deleting food:', err);
+                const errorMessage = err.response?.data?.message || 'Failed to delete food';
                 setError(errorMessage);
 
                 // If unauthorized, redirect to login
@@ -1000,7 +1000,7 @@ const AdminDashboard = () => {
                             variant={activeTab === 'pizzas' ? 'primary' : 'outline-primary'} 
                             onClick={() => setActiveTab('pizzas')}
                         >
-                            Manage Pizzas
+                            Manage Foods
                     </TabButton>
                     <TabButton 
                             variant={activeTab === 'orders' ? 'primary' : 'outline-primary'} 
@@ -1022,7 +1022,7 @@ const AdminDashboard = () => {
                         <Row className="mb-3">
                             <Col>
                                 <TabButton variant="success" onClick={() => setShowAddModal(true)}>
-                                    Add New Pizza
+                                    Add New Food
                                 </TabButton>
                             </Col>
                         </Row>
@@ -1172,7 +1172,7 @@ const AdminDashboard = () => {
                 {/* Add Pizza Modal */}
                 <StyledModal show={showAddModal} onHide={() => setShowAddModal(false)} size="lg">
                     <Modal.Header closeButton>
-                        <Modal.Title>Add New Pizza</Modal.Title>
+                        <Modal.Title>Add New Food</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <Form onSubmit={handleSubmit}>
@@ -1205,7 +1205,7 @@ const AdminDashboard = () => {
                                     name="name"
                                     value={formData.name}
                                     onChange={handleInputChange}
-                                        placeholder="Enter pizza name"
+                                        placeholder="Enter Food name"
                                     required
                                 />
                             </Form.Group>
@@ -1233,7 +1233,7 @@ const AdminDashboard = () => {
                                                 name="description"
                                                 value={formData.description}
                                                 onChange={handleInputChange}
-                                                placeholder="Enter pizza description"
+                                                placeholder="Enter Food description"
                                                 required
                                             />
                                         </Form.Group>
@@ -1390,7 +1390,7 @@ const AdminDashboard = () => {
                                     type="submit"
                                     size="lg"
                                 >
-                                Add Pizza
+                                Add Food
                             </Button>
                             </div>
                         </Form>
@@ -1400,7 +1400,7 @@ const AdminDashboard = () => {
                 {/* Edit Pizza Modal */}
                 <StyledModal show={showEditModal} onHide={() => setShowEditModal(false)} size="lg">
                     <Modal.Header closeButton>
-                        <Modal.Title>Edit Pizza</Modal.Title>
+                        <Modal.Title>Edit Food</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <Form onSubmit={handleUpdate}>
@@ -1524,7 +1524,7 @@ const AdminDashboard = () => {
                             </Form.Group>
 
                             <Button variant="primary" type="submit">
-                                Update Pizza
+                                Update Food
                             </Button>
                         </Form>
                     </Modal.Body>

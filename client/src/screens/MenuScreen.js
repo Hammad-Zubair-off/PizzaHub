@@ -258,7 +258,7 @@ const MenuScreen = () => {
         <MenuHeader>
           <MenuTitle>Our <span>Menu</span></MenuTitle>
           <MenuDescription>
-            Discover our handcrafted pizzas made with fresh ingredients and baked to perfection
+            Discover our handcrafted foods made with fresh ingredients and baked to perfection
           </MenuDescription>
         </MenuHeader>
 
@@ -273,7 +273,7 @@ const MenuScreen = () => {
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
               >
-                <option value="all">All Pizzas</option>
+                <option value="all">All foods</option>
                 <option value="veg">Vegetarian</option>
                 <option value="non-veg">Non-Vegetarian</option>
               </Form.Select>
@@ -319,9 +319,9 @@ const MenuScreen = () => {
               <div className="col-12">
                 <NoResults variant="info">
                   {searchQuery ? (
-                    <>No pizzas found matching <strong>"{searchQuery}"</strong>.</>
+                    <>No foods found matching <strong>"{searchQuery}"</strong>.</>
                   ) : (
-                    'No pizzas found. Try adjusting your filters.'
+                    'No foods found. Try adjusting your filters.'
                   )}
                 </NoResults>
               </div>

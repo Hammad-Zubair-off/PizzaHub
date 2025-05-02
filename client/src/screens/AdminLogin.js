@@ -64,7 +64,7 @@ const AdminLogin = () => {
                 <div className="auth-overlay">
                     <div className="auth-content">
                         <h1>Admin Portal</h1>
-                        <p>Access the admin dashboard to manage your pizza store.</p>
+                        <p>Access the admin dashboard to manage your Food store.</p>
                     </div>
                 </div>
             </div>

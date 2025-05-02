@@ -95,7 +95,7 @@ const Cartscreen = () => {
                             <FaShoppingCart />
                         </div>
                         <h4>Your cart is empty</h4>
-                        <p className="text-muted">Add some delicious pizzas to your cart!</p>
+                        <p className="text-muted">Add some delicious Foods to your cart!</p>
                         <Link to="/menu" className="btn btn-primary btn-lg mt-3">
                             <FaArrowLeft className="me-2" />
                             Continue Shopping

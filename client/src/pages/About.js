@@ -174,19 +174,19 @@ const About = () => {
             <Col lg={7}>
               <SectionTitle>Who We Are</SectionTitle>
               <Text>
-                Founded in 2023, PizzaHub was born from a passion for creating the perfect pizza experience. 
-                What started as a small family-owned pizzeria has grown into a beloved destination for pizza 
+                Founded in 2023, PizzaHub was born from a passion for creating the perfect food experience. 
+                What started as a small family-owned pizzeria has grown into a beloved destination for food 
                 lovers, while maintaining our commitment to quality and tradition.
               </Text>
               <Text>
-                We believe that great pizza comes from great ingredients, time-honored techniques, and 
+                We believe that great food comes from great ingredients, time-honored techniques, and 
                 most importantly, the love and dedication we put into every pie we create. Our journey 
-                began with a simple dream: to serve the most authentic and delicious pizzas while creating 
+                began with a simple dream: to serve the most authentic and delicious foods while creating 
                 memorable experiences for our customers.
               </Text>
               <SectionTitle>Our Mission</SectionTitle>
               <Text>
-                At PizzaHub, our mission is to serve the most delicious and authentic pizzas while 
+                At PizzaHub, our mission is to serve the most delicious and authentic foods while 
                 providing an exceptional dining experience. We're committed to using the finest 
                 ingredients, supporting local suppliers, and maintaining sustainable practices.
               </Text>
@@ -212,7 +212,7 @@ const About = () => {
                   <i className="fas fa-utensils" style={{ color: '#FF5722' }}></i>
                   Expert Craftsmanship
                 </h3>
-                <p>Our pizzas are crafted by experienced chefs who are passionate about their art, bringing years of expertise to every pizza they create.</p>
+                <p>Our foods are crafted by experienced chefs who are passionate about their art, bringing years of expertise to every food they create.</p>
               </FeatureCard>
             </Col>
             <Col md={4}>
@@ -236,7 +236,7 @@ const About = () => {
                   Quality, authenticity, and customer satisfaction are at the heart of everything we do. 
                   We're committed to creating not just meals, but memorable experiences that bring people 
                   together. Our dedication to excellence extends from our kitchen to your table, ensuring 
-                  that every pizza tells a story of passion and craftsmanship.
+                  that every food tells a story of passion and craftsmanship.
                 </Text>
               </Col>
             </Row>

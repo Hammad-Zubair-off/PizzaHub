@@ -41,6 +41,12 @@
   gap: 15px;
   justify-content: center;
 }
+.not-found-actions a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
 
 .not-found-actions .btn {
   padding: 10px 20px;

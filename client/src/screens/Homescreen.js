@@ -126,6 +126,27 @@ const OrderButton = styled(Link)`
     color: white;
   }
 `;
+const OrderButtonPopular = styled(Link)`
+  display: inline-block;
+  padding: 1rem 1.25rem;
+  background-color: ${theme.colors.primary};
+  color: white;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 14px;
+  transition: transform 0.3s ease;
+
+  @media (max-width: 768px) {
+    padding: 0.5rem 1.4rem;
+    font-size: 16px;
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+    color: white;
+  }
+`;
 
 const BannerCard = styled.div`
   background-color: ${theme.colors.secondary};
@@ -737,7 +758,7 @@ const { loading, error, pizzas = [] } = pizzaState || { loading: false, error: n
 
 
   useEffect(() => {
-    console.log("Dispatching fetchPizzas action");
+    console.log("Dispatching fetchfoods action");
     dispatch(fetchPizzas());
   }, [dispatch]);
 
@@ -808,80 +829,7 @@ const { loading, error, pizzas = [] } = pizzaState || { loading: false, error: n
         </RightContent>
       </HeroSection>
 
-      <BestSellersSection>
-        <SectionTitle>
-          <h2>
-            Our best Seller Dishes
-            <span>🔥🔥</span>
-          </h2>
-          <p>Our fresh garden salad is a light and refreshing option. It features a mix of crisp lettuce, juicy tomatoes all tossed in your choice of dressing.</p>
-        </SectionTitle>
-
-        {/* Debug the rendering conditions */}
-        <div style={{ display: 'none' }}>
-          Debug Info:
-          <ul>
-            <li>Loading: {String(loading)}</li>
-            <li>Error: {String(error)}</li>
-            <li>Is Pizzas Array: {String(Array.isArray(pizzas))}</li>
-            <li>Pizzas Length: {String(pizzas?.length)}</li>
-          </ul>
-      </div>
-
-        {loading ? (
-          <>
-            <div>Loading state is true, showing loader</div>
-          <Loader />
-          </>
-        ) : error ? (
-          <>
-            <div>Error exists: {String(error)}, showing error</div>
-            <Error message="Error loading dishes. Please try again later." />
-          </>
-        ) : Array.isArray(pizzas) && pizzas.length > 0 ? (
-          <>
-            <div></div>
-            <DishesGrid>
-              {pizzas.slice(0, 6).map((pizza) => (
-                <DishCard key={pizza._id}>
-                  <DishImage>
-                    <img 
-                      src={pizza.image} 
-                      alt={pizza.name}
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = '/images/pizza-placeholder.jpg';
-                      }}
-                    />
-                  </DishImage>
-                  <DishInfo>
-                    <DishCategory>{pizza.category || 'Pizza'}</DishCategory>
-                    <DishName>{pizza.name}</DishName>
-                    <DishRating>
-                      {[...Array(Math.round(pizza.rating || 5))].map((_, index) => (
-                        <AiFillStar key={index} />
-                      ))}
-                    </DishRating>
-                    <DishPrice>
-                      <span>Starting from Rs.{getPizzaPrice(pizza)}</span>
-                      <BuyButton as={Link} to={`/pizza/${pizza._id}`}>
-                        Order Now
-                      </BuyButton>
-                    </DishPrice>
-                  </DishInfo>
-                </DishCard>
-              ))}
-            </DishesGrid>
-          </>
-        ) : (
-          <>
-            <div>Condition failed: Either pizzas is not an array or length is 0</div>
-            <div style={{ textAlign: 'center', padding: '2rem' }}>
-              <p>No dishes available at the moment.</p>
-            </div>
-          </>
-        )}
-      </BestSellersSection>
+      
 
       <FeaturesSection>
         {features.map((feature) => (

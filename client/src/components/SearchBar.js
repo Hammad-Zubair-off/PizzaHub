@@ -154,7 +154,7 @@ const SearchBar = ({ onSearch, suggestions = [] }) => {
                 <div className="position-relative">
                     <SearchInput
                         type="search"
-                        placeholder="Search by pizza name..."
+                        placeholder="Search by Food name..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         autoComplete="off"
