@@ -1,4 +1,4 @@
-# Pizza Hub
+# Foodie Hub
 
 **Deployed Link:**  
 [Live Project](https://pizza-hub-six.vercel.app/)
@@ -23,8 +23,8 @@
 ### User Routes
 ![User Routes](./screenshoots/UserRoutes.jpg)
 
-# PizzaHub 🍕  
-**A MERN Stack Pizza Ordering App**
+# FoodieFiesta 🍕  
+**A MERN Stack Foodie Ordering App**
 
 ## Table of Contents
 - [Overview](#overview)
@@ -37,7 +37,7 @@
 ---
 
 ## Overview  
-PizzaHub is a feature-rich food ordering application built using the MERN stack. It provides seamless user experience, including user authentication, cart management, and an admin panel for managing products. With Redux for state management and Postman for API testing, the app is designed for efficiency and reliability.
+FoodieFiesta is a feature-rich food ordering application built using the MERN stack. It provides seamless user experience, including user authentication, cart management, and an admin panel for managing products. With Redux for state management and Postman for API testing, the app is designed for efficiency and reliability.
 
 ---
 

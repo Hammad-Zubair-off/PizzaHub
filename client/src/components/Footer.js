@@ -242,7 +242,7 @@ const Footer = () => {
       </FooterGrid>
 
       <BottomFooter>
-        <div>© 2023 PizzaHub Ltd. All rights reserved.</div>
+        <div>© 2023 FoodieFiesta Ltd. All rights reserved.</div>
         <FooterNav>
           <Link to="#">English</Link>
           <Link to="#">Privacy</Link>

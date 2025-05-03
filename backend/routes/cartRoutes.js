@@ -27,7 +27,6 @@ router.post("/add", authenticate, async (req, res) => {
     }
 
     const pizza = await Pizza.findById(pizzaId);
-    console.log(pizza, "pizza");
     if (!pizza) {
       return res.status(404).json({
         success: false,

@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { Card, Badge, Modal, Row, Col, Form } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { addToCart as addToCartRedux } from '../reducers/cartReducer';
-import 'react-toastify/dist/ReactToastify.css';
-import styled from 'styled-components';
-import { theme } from '../styles/theme';
-import { FaStar, FaClock, FaPepperHot, FaShoppingCart } from 'react-icons/fa';
-import { ToastContainer } from 'react-toastify';
+import React, { useState } from "react";
+import { Card, Badge, Modal, Row, Col, Form } from "react-bootstrap";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { addToCart as addToCartRedux } from "../reducers/cartReducer";
+import "react-toastify/dist/ReactToastify.css";
+import styled from "styled-components";
+import { theme } from "../styles/theme";
+import { FaStar, FaClock, FaPepperHot, FaShoppingCart } from "react-icons/fa";
+import { ToastContainer } from "react-toastify";
 
 const StyledCard = styled(Card)`
   border: none;
@@ -32,13 +32,13 @@ const ImageWrapper = styled.div`
   background: #f8f8f8;
 
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
     height: 30%;
-    background: linear-gradient(to top, rgba(0,0,0,0.3), transparent);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.3), transparent);
     z-index: 1;
   }
 `;
@@ -66,36 +66,38 @@ const CategoryBadge = styled(Badge)`
   font-size: 0.7rem;
   font-weight: 600;
   z-index: 2;
-  background: ${props => props.bg === 'success' 
-    ? 'linear-gradient(135deg, #22c55e, #10b981)'
-    : props.bg === 'danger' 
-      ? 'linear-gradient(135deg, #ef4444, #f87171)'
-      : 'linear-gradient(135deg, #f5f5f5, #e0e0e0)'
-  };
+  background: ${(props) =>
+    props.bg === "success"
+      ? "linear-gradient(135deg, #22c55e, #10b981)"
+      : props.bg === "danger"
+      ? "linear-gradient(135deg, #ef4444, #f87171)"
+      : "linear-gradient(135deg, #f5f5f5, #e0e0e0)"};
   border: 1px solid rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(8px);
-  box-shadow: 0 2px 8px ${props => props.bg === 'success' 
-    ? 'rgba(16, 185, 129, 0.15)'
-    : props.bg === 'danger' 
-      ? 'rgba(239, 68, 68, 0.15)'
-      : 'rgba(224, 224, 224, 0.15)'
-  };
+  box-shadow: 0 2px 8px
+    ${(props) =>
+      props.bg === "success"
+        ? "rgba(16, 185, 129, 0.15)"
+        : props.bg === "danger"
+        ? "rgba(239, 68, 68, 0.15)"
+        : "rgba(224, 224, 224, 0.15)"};
   letter-spacing: 0.5px;
   display: flex;
   align-items: center;
   gap: 0.3rem;
   text-transform: uppercase;
-  font-family: 'Nunito', sans-serif;
+  font-family: "Nunito", sans-serif;
   transition: all 0.3s ease;
 
   ${StyledCard}:hover & {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px ${props => props.bg === 'success' 
-      ? 'rgba(16, 185, 129, 0.2)'
-      : props.bg === 'danger' 
-        ? 'rgba(239, 68, 68, 0.2)'
-        : 'rgba(224, 224, 224, 0.2)'
-    };
+    box-shadow: 0 4px 12px
+      ${(props) =>
+        props.bg === "success"
+          ? "rgba(16, 185, 129, 0.2)"
+          : props.bg === "danger"
+          ? "rgba(239, 68, 68, 0.2)"
+          : "rgba(224, 224, 224, 0.2)"};
   }
 `;
 
@@ -117,7 +119,7 @@ const PopularBadge = styled(Badge)`
   align-items: center;
   gap: 0.3rem;
   text-transform: uppercase;
-  font-family: 'Nunito', sans-serif;
+  font-family: "Nunito", sans-serif;
   transition: all 0.3s ease;
 
   ${StyledCard}:hover & {
@@ -136,8 +138,8 @@ const Title = styled.h3`
   font-weight: 700;
   color: #2d3748;
   margin-bottom: 0.5rem;
-  font-family: 'Nunito', sans-serif;
-  
+  font-family: "Nunito", sans-serif;
+
   ${StyledCard}:hover & {
     color: ${theme.colors.primary};
   }
@@ -164,10 +166,10 @@ const SpiceLevel = styled.div`
   margin-bottom: 0.5rem;
 
   svg {
-    color: #EF4444;
+    color: #ef4444;
     font-size: 0.9rem;
     transition: all 0.3s ease;
-    
+
     ${StyledCard}:hover & {
       transform: scale(1.1);
     }
@@ -189,8 +191,8 @@ const PriceTag = styled.div`
   font-size: 1.2rem;
   font-weight: 700;
   color: ${theme.colors.primary};
-  font-family: 'Nunito', sans-serif;
-  
+  font-family: "Nunito", sans-serif;
+
   ${StyledCard}:hover & {
     color: ${theme.colors.secondary};
   }
@@ -244,10 +246,11 @@ const VariantButtons = styled.div`
 
 const VariantButton = styled.button`
   padding: 0.75rem;
-  border: 2px solid ${props => props.active ? theme.colors.primary : '#eee'};
+  border: 2px solid ${(props) => (props.active ? theme.colors.primary : "#eee")};
   border-radius: 8px;
-  background: ${props => props.active ? `${theme.colors.primary}10` : 'white'};
-  color: ${props => props.active ? theme.colors.primary : '#666'};
+  background: ${(props) =>
+    props.active ? `${theme.colors.primary}10` : "white"};
+  color: ${(props) => (props.active ? theme.colors.primary : "#666")};
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -258,7 +261,8 @@ const VariantButton = styled.button`
 
   &:hover {
     border-color: ${theme.colors.primary};
-    background: ${props => props.active ? `${theme.colors.primary}10` : `${theme.colors.primary}05`};
+    background: ${(props) =>
+      props.active ? `${theme.colors.primary}10` : `${theme.colors.primary}05`};
   }
 
   span.price {
@@ -320,7 +324,7 @@ const AddToCartButton = styled.button`
 
 const IngredientsSection = styled.div`
   margin-bottom: 1.5rem;
-  
+
   h5 {
     font-size: 1rem;
     font-weight: 600;
@@ -355,143 +359,142 @@ const IngredientTag = styled.span`
 `;
 
 const PizzaCard = ({ pizza }) => {
-    const [modalShow, setModalShow] = useState(false);
-    const [selectedVarient, setSelectedVarient] = useState(pizza.varients[0]);
-    const [quantity, setQuantity] = useState(1);
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+  const [modalShow, setModalShow] = useState(false);
+  const [selectedVarient, setSelectedVarient] = useState(pizza.varients[0]);
+  const [quantity, setQuantity] = useState(1);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
+  const handleAddToCart = (item) => {
+    dispatch(addToCartRedux(item._id, quantity, selectedVarient, navigate));
+  };
 
-    const handleAddToCart = (item) => {
-        
-        dispatch(addToCartRedux(item._id, quantity, selectedVarient, navigate));
-    };
+  const getPrice = (varient) => {
+    return pizza.prices.find((p) => p.varient === varient)?.price || 0;
+  };
 
-    const getPrice = (varient) => {
-        return pizza.prices.find(p => p.varient === varient)?.price || 0;
-    };
-
-    return (
-        <>
-            <ToastContainer position="top-right" autoClose={3000} />
-            <StyledCard onClick={() => setModalShow(true)}>
-                <ImageWrapper>
-                    <StyledImage src={pizza.image} alt={pizza.name} />
-                    {pizza.category && (
-                        <CategoryBadge 
-                            bg={pizza.category === 'Veg' ? 'success' : 
-                                pizza.category === 'Non-Veg' ? 'danger' : 
-                                'secondary'} 
-                        >
-                            {pizza.category}
-                        </CategoryBadge>
-                    )}
-                    {pizza.popularity >= 90 && (
-                        <PopularBadge>
-                            Popular
-                        </PopularBadge>
-                    )}
-                </ImageWrapper>
-                <CardContent>
-                    <Title>{pizza.name}</Title>
-                    <MetaInfo>
-                        <div >
-                            <FaStar /> {pizza.rating}
-                        </div>
-                        <div>
-                            <FaClock /> {pizza.cookingTime} min
-                        </div>
-                    </MetaInfo>
-                    <SpiceLevel>
-                        {[...Array(pizza.spiceLevel)].map((_, i) => (
-                            <FaPepperHot key={i} />
-                        ))}
-                    </SpiceLevel>
-                    <Description>
-                        {pizza.description}
-                    </Description>
-                    <PriceTag>
-                        From Rs. {Math.min(...pizza.prices.map(p => p.price))}
-                    </PriceTag>
-                </CardContent>
-            </StyledCard>
-
-            <StyledModal
-                show={modalShow}
-                onHide={() => setModalShow(false)}
-                size="lg"
-                centered
+  return (
+    <>
+      <ToastContainer position="top-right" autoClose={3000} />
+      <StyledCard onClick={() => setModalShow(true)}>
+        <ImageWrapper>
+          <StyledImage src={pizza.image} alt={pizza.name} />
+          {pizza.category && (
+            <CategoryBadge
+              bg={
+                pizza.category === "Veg"
+                  ? "success"
+                  : pizza.category === "Non-Veg"
+                  ? "danger"
+                  : "secondary"
+              }
             >
-                <Modal.Header closeButton>
-                    <ModalTitle>{pizza.name}</ModalTitle>
-                </Modal.Header>
-                <Modal.Body>
-                    <Row>
-                        <Col md={6}>
-                            <ModalImage src={pizza.image} alt={pizza.name} />
-                            <IngredientsSection>
-                                <h5>
-                                    <FaPepperHot /> Ingredients
-                                </h5>
-                                <IngredientsList>
-                                    {pizza.ingredients && pizza.ingredients.map((ingredient, index) => (
-                                        <IngredientTag key={index}>
-                                            {ingredient}
-                                        </IngredientTag>
-                                    ))}
-                                </IngredientsList>
-                            </IngredientsSection>
-                        </Col>
-                        <Col md={6}>
-                            <ModalTitle>{pizza.name}</ModalTitle>
-                            <ModalDescription>{pizza.description}</ModalDescription>
-                            
-                            <MetaInfo>
-                                <div>
-                                    <FaStar /> {pizza.rating}
-                                </div>
-                                    <div>
-                                    <FaClock /> {pizza.cookingTime} min
-                                </div>
-                            </MetaInfo>
+              {pizza.category}
+            </CategoryBadge>
+          )}
+          {pizza.popularity >= 90 && <PopularBadge>Popular</PopularBadge>}
+        </ImageWrapper>
+        <CardContent>
+          <Title>{pizza.name}</Title>
+          <MetaInfo>
+            <div>
+              <FaStar /> {pizza.rating}
+            </div>
+            <div>
+              <FaClock /> {pizza.cookingTime} min
+            </div>
+          </MetaInfo>
+          <SpiceLevel>
+            {[...Array(pizza.spiceLevel)].map((_, i) => (
+              <FaPepperHot key={i} />
+            ))}
+          </SpiceLevel>
+          <Description>{pizza.description}</Description>
+          <PriceTag>
+            From Rs. {Math.min(...pizza.prices.map((p) => p.price))}
+          </PriceTag>
+        </CardContent>
+      </StyledCard>
 
-                            <SizeSelector>
-                                <h5>Select Size:</h5>
-                                <VariantButtons>
-                                    {pizza.varients.map((varient) => (
-                                        <VariantButton
-                                            key={varient}
-                                            active={selectedVarient === varient}
-                                            onClick={() => setSelectedVarient(varient)}
-                                        >
-                                            {varient}
-                                            <span className="price">Rs. {getPrice(varient)}</span>
-                                        </VariantButton>
-                                    ))}
-                                </VariantButtons>
-                            </SizeSelector>
+      <StyledModal
+        show={modalShow}
+        onHide={() => setModalShow(false)}
+        size="lg"
+        centered
+      >
+        <Modal.Header closeButton>
+          <ModalTitle>{pizza.name}</ModalTitle>
+        </Modal.Header>
+        <Modal.Body>
+          <Row>
+            <Col md={6}>
+              <ModalImage src={pizza.image} alt={pizza.name} />
+              <IngredientsSection>
+                <h5>
+                  <FaPepperHot /> Ingredients
+                </h5>
+                <IngredientsList>
+                  {pizza.ingredients &&
+                    pizza.ingredients.map((ingredient, index) => (
+                      <IngredientTag key={index}>{ingredient}</IngredientTag>
+                    ))}
+                </IngredientsList>
+              </IngredientsSection>
+            </Col>
+            <Col md={6}>
+              <ModalTitle>{pizza.name}</ModalTitle>
+              <ModalDescription>{pizza.description}</ModalDescription>
 
-                            <QuantityContainer>
-                                <h5>Quantity:</h5>
-                                <Form.Control
-                                    type="number"
-                                    min={1}
-                                    max={10}
-                                    value={quantity}
-                                    onChange={e => setQuantity(Math.max(1, Math.min(10, Number(e.target.value))))}
-                                />
-                            </QuantityContainer>
+              <MetaInfo>
+                <div>
+                  <FaStar /> {pizza.rating}
+                </div>
+                <div>
+                  <FaClock /> {pizza.cookingTime} min
+                </div>
+              </MetaInfo>
 
-                            <AddToCartButton onClick={() => handleAddToCart(pizza)}>
-                                <FaShoppingCart />
-                                Add to Cart - Rs. {getPrice(selectedVarient)}
-                            </AddToCartButton>
-                        </Col>
-                    </Row>
-                </Modal.Body>
-            </StyledModal>
-        </>
-    );
+              <SizeSelector>
+                <h5>Select Size:</h5>
+                <VariantButtons>
+                  {pizza.varients.map((varient) => (
+                    <VariantButton
+                      key={varient}
+                      active={selectedVarient === varient}
+                      onClick={() => setSelectedVarient(varient)}
+                    >
+                      {varient}
+                      <span className="price">Rs. {getPrice(varient)}</span>
+                    </VariantButton>
+                  ))}
+                </VariantButtons>
+              </SizeSelector>
+
+              <QuantityContainer>
+                <h5>Quantity:</h5>
+                <Form.Control
+                  type="number"
+                  min={1}
+                  max={10}
+                  value={quantity}
+                  onChange={(e) =>
+                    setQuantity(
+                      Math.max(1, Math.min(10, Number(e.target.value)))
+                    )
+                  }
+                />
+              </QuantityContainer>
+
+              <AddToCartButton onClick={() => handleAddToCart(pizza)}>
+                <FaShoppingCart />
+                Add to Cart - Rs. {getPrice(selectedVarient)}
+              </AddToCartButton>
+            </Col>
+          </Row>
+        </Modal.Body>
+      </StyledModal>
+    </>
+  );
 };
 
-export default PizzaCard; 
+export default PizzaCard;

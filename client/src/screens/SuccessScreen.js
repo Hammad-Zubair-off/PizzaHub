@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
-import { Container, Row, Col, Card, Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { clearCart } from '../actions/cartActions';
-import { FaCheckCircle, FaShoppingBag, FaClipboardList } from 'react-icons/fa';
-import '../styles/SuccessScreen.css';
+import React, { useEffect } from "react";
+import { Container, Row, Col, Card, Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { clearCart } from "../actions/cartActions";
+import { FaCheckCircle, FaShoppingBag, FaClipboardList } from "react-icons/fa";
+import "../styles/SuccessScreen.css";
 
 const SuccessScreen = () => {
   const dispatch = useDispatch();
@@ -26,8 +26,9 @@ const SuccessScreen = () => {
                 </div>
                 <h1 className="success-title">Payment Successful!</h1>
                 <p className="success-message">
-                  Thank you for your order. Your payment has been processed successfully.
-                  We'll send you an email with your order details shortly.
+                  Thank you for your order. Your payment has been processed
+                  successfully. We'll send you an email with your order details
+                  shortly.
                 </p>
                 <div className="success-buttons d-grid gap-3">
                   <Link to="/menu" className="text-decoration-none">
@@ -52,4 +53,4 @@ const SuccessScreen = () => {
   );
 };
 
-export default SuccessScreen; 
+export default SuccessScreen;

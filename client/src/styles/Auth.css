@@ -241,19 +241,6 @@
     font-family: 'Open Sans', sans-serif;
 }
 
-.forgot-password {
-    color: #E44D26;
-    font-size: 0.95rem;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    font-family: 'Open Sans', sans-serif;
-    font-weight: 600;
-}
-
-.forgot-password:hover {
-    color: #F16529;
-    text-decoration: underline;
-}
 
 .btn-primary {
     width: 100%;

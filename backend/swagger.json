@@ -2,8 +2,8 @@
   "swagger": "2.0",
   "info": {
     "version": "1.0.0",
-    "title": "PizzaHub API",
-    "description": "API documentation for PizzaHub application"
+    "title": "FoodieFiesta API",
+    "description": "API documentation for FoodieFiesta application"
   },
   "host": "localhost:5000",
   "basePath": "/api",

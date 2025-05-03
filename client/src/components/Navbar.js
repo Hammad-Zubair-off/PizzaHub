@@ -166,78 +166,6 @@ const LoginButton = styled(Link)`
   }
 `;
 
-// CategoryFilter Component
-const CategoryFilter = () => (
-    <Dropdown className="category-filter mx-2">
-        <Dropdown.Toggle variant="outline-secondary" id="category-dropdown">
-            <i className="fas fa-filter me-1"></i>
-            Filter
-        </Dropdown.Toggle>
-        <Dropdown.Menu>
-            <Dropdown.Item as={Link} to="/menu?category=all">All foods</Dropdown.Item>
-            <Dropdown.Item as={Link} to="/menu?category=veg">Veg Only</Dropdown.Item>
-            <Dropdown.Item as={Link} to="/menu?category=non-veg">Non-Veg</Dropdown.Item>
-            <Dropdown.Divider />
-            <Dropdown.Item as={Link} to="/menu?sort=popular">Most Popular</Dropdown.Item>
-            <Dropdown.Item as={Link} to="/menu?sort=rating">Top Rated</Dropdown.Item>
-        </Dropdown.Menu>
-    </Dropdown>
-);
-
-// UserMenu Component
-const UserMenu = ({ user, handleLogout }) => (
-    <Dropdown align="end">
-        <Dropdown.Toggle 
-            as="div" 
-            className="nav-link user-dropdown d-flex align-items-center px-3"
-        >
-            <div className="avatar me-2">
-                {user?.name?.charAt(0).toUpperCase()}
-            </div>
-            <span className="d-none d-lg-block">
-                {user?.name || 'Account'}
-            </span>
-        </Dropdown.Toggle>
-        <Dropdown.Menu className="shadow-sm">
-            <Dropdown.Item as={Link} to="/profile">
-                <i className="fas fa-user me-2"></i>
-                Profile
-            </Dropdown.Item>
-            <Dropdown.Item as={Link} to="/orders">
-                <i className="fas fa-receipt me-2"></i>
-                Orders
-            </Dropdown.Item>
-            <Dropdown.Item as={Link} to="/favorites">
-                <i className="fas fa-heart me-2"></i>
-                Favorites
-            </Dropdown.Item>
-            <Dropdown.Divider />
-            <Dropdown.Item 
-                className="text-danger"
-                onClick={handleLogout}
-            >
-                <i className="fas fa-sign-out-alt me-2"></i>
-                Logout
-            </Dropdown.Item>
-        </Dropdown.Menu>
-    </Dropdown>
-);
-
-// Cart Button Component
-const CartButton = ({ itemCount }) => (
-    <Link 
-        className="nav-link position-relative px-3" 
-        to="/cart"
-    >
-        <i className="fas fa-shopping-cart"></i>
-        {itemCount > 0 && (
-            <span className="cart-badge">
-                {itemCount}
-            </span>
-        )}
-    </Link>
-);
-
 // Admin Login Modal Component
 const AdminLoginModal = ({ show, handleClose, handleSubmit, error, loading }) => {
     const [formData, setFormData] = useState({
@@ -343,7 +271,7 @@ const Navbar = () => {
         <>
             <NavbarContainer>
                 <Logo to="/">
-                    <span>Foo</span>die
+                    <span>Food</span>fiesta
                 </Logo>
                 
                 <HamburgerButton 
@@ -362,27 +290,25 @@ const Navbar = () => {
                         <LoginButton as="button" onClick={handleLogout}>Logout</LoginButton>
                     </NavLinks>
                 ) : (
-                    // Regular User Navigation
-                    <>
-                        <NavLinks $isOpen={isMenuOpen}>
-                            <NavLink to="/" onClick={() => setIsMenuOpen(false)}>Home</NavLink>
-                            <NavLink to="/menu" onClick={() => setIsMenuOpen(false)}>Our Menu</NavLink>
-                            <NavLink to="/about" onClick={() => setIsMenuOpen(false)}>About us</NavLink>
-                            <NavLink to="/contact" onClick={() => setIsMenuOpen(false)}>Contact us</NavLink>
-                        </NavLinks>
-
+                    // Regular User Navigation - Combined into a single NavLinks block
+                    <NavLinks $isOpen={isMenuOpen}>
+                        <NavLink to="/" onClick={() => setIsMenuOpen(false)}>Home</NavLink>
+                        <NavLink to="/menu" onClick={() => setIsMenuOpen(false)}>Our Menu</NavLink>
+                        <NavLink to="/about" onClick={() => setIsMenuOpen(false)}>About us</NavLink>
+                        <NavLink to="/contact" onClick={() => setIsMenuOpen(false)}>Contact us</NavLink>
+                        
                         {user ? (
-                            <NavLinks $isOpen={isMenuOpen}>
+                            <>
                                 <NavLink to="/cart" onClick={() => setIsMenuOpen(false)}>Cart</NavLink>
                                 <NavLink to="/orders" onClick={() => setIsMenuOpen(false)}>Orders</NavLink>
                                 <NavLink to="/profile" onClick={() => setIsMenuOpen(false)}>Profile</NavLink>
                                 <LoginButton as="button" onClick={handleLogout}>Logout</LoginButton>
-                            </NavLinks>
+                            </>
                         ) : (
                             <LoginButton to="/login" onClick={() => setIsMenuOpen(false)}>Login</LoginButton>
                         )}
-                                </>
-                            )}
+                    </NavLinks>
+                )}
             </NavbarContainer>
 
             <AdminLoginModal

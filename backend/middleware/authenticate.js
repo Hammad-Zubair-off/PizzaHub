@@ -4,7 +4,6 @@ require('dotenv').config();
 
 exports.authenticate = async (req, res, next) => {
     try {
-        console.log("authenticate",req.header("Authorization"));
         const token = req.header("Authorization")?.split(" ")[1];
         
         if (!token) {
@@ -16,13 +15,11 @@ exports.authenticate = async (req, res, next) => {
 
         const decoded = jwt.verify(token, process.env.SECRET_KEY);
         
-        // Handle admin authentication
         if (decoded.role === 'admin' || decoded.isAdmin) {
             req.user = decoded;
             return next();
         }
 
-        // Handle regular user authentication
         const user = await User.findById(decoded.id);
         if (!user) {
             return res.status(401).json({ 

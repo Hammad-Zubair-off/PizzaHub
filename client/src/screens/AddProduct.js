@@ -16,7 +16,9 @@ const AddProduct = () => {
 
   // Handle variant selection
   const handleVariantChange = (e) => {
-    const variants = [...e.target.selectedOptions].map((option) => option.value);
+    const variants = [...e.target.selectedOptions].map(
+      (option) => option.value
+    );
     setSelectedVariants(variants);
 
     // Initialize prices when variants are selected
@@ -71,7 +73,6 @@ const AddProduct = () => {
         },
       });
 
-      console.log("Product added successfully:", response.data);
       alert("Product added successfully");
       navigate("/productList");
     } catch (error) {
@@ -85,13 +86,15 @@ const AddProduct = () => {
   return (
     <div className="container mt-4">
       <h2 className="text-center mb-4">Add New Product</h2>
-      
+
       {error && <div className="alert alert-danger">{error}</div>}
-      
-      <form onSubmit={handleSubmit} className="p-4 border rounded shadow-sm bg-light">
+
+      <form
+        onSubmit={handleSubmit}
+        className="p-4 border rounded shadow-sm bg-light"
+      >
         {/* Product Name */}
         <div className="mb-3">
-          
           <label className="form-label">Product Name</label>
           <input
             type="text"
@@ -105,12 +108,19 @@ const AddProduct = () => {
         {/* Variants Selection */}
         <div className="mb-3">
           <label className="form-label">Select Variants</label>
-          <select multiple className="form-control" onChange={handleVariantChange} value={selectedVariants}>
+          <select
+            multiple
+            className="form-control"
+            onChange={handleVariantChange}
+            value={selectedVariants}
+          >
             <option value="small">Small</option>
             <option value="medium">Medium</option>
             <option value="large">Large</option>
           </select>
-          <small className="text-muted">Hold Ctrl/Cmd to select multiple variants</small>
+          <small className="text-muted">
+            Hold Ctrl/Cmd to select multiple variants
+          </small>
         </div>
 
         {/* Prices */}
@@ -135,7 +145,12 @@ const AddProduct = () => {
         {/* Category */}
         <div className="mb-3">
           <label className="form-label">Category</label>
-          <select className="form-control" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} required>
+          <select
+            className="form-control"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            required
+          >
             <option value="">Select Category</option>
             <option value="veg">Vegetarian</option>
             <option value="non-veg">Non-Vegetarian</option>
@@ -169,7 +184,11 @@ const AddProduct = () => {
         </div>
 
         {/* Submit Button */}
-        <button type="submit" className="btn btn-success w-100" disabled={loading}>
+        <button
+          type="submit"
+          className="btn btn-success w-100"
+          disabled={loading}
+        >
           {loading ? "Adding..." : "Add Product"}
         </button>
       </form>

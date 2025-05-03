@@ -1,23 +1,23 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchPizzas } from '../actions/pizzaActions';
-import PizzaCard from '../components/PizzaCard';
-import { Row, Col, Container, Alert, Form } from 'react-bootstrap';
-import Loader from '../components/Loader';
-import SearchBar from '../components/SearchBar';
-import styled from 'styled-components';
-import { theme } from '../styles/theme';
-import { FaFilter, FaSort, FaSearch } from 'react-icons/fa';
+import React, { useEffect, useState, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchPizzas } from "../actions/pizzaActions";
+import PizzaCard from "../components/PizzaCard";
+import { Row, Col, Container, Alert, Form } from "react-bootstrap";
+import Loader from "../components/Loader";
+import SearchBar from "../components/SearchBar";
+import styled from "styled-components";
+import { theme } from "../styles/theme";
+import { FaFilter, FaSort, FaSearch } from "react-icons/fa";
 
 const MenuSection = styled.section`
-  background-color: #FFF8F3;
+  background-color: #fff8f3;
   min-height: 100vh;
   width: 100%;
 `;
 
 const MenuContainer = styled(Container)`
   padding: 3rem 1.5rem;
-  
+
   @media (min-width: 768px) {
     padding: 4rem 2rem;
   }
@@ -33,7 +33,7 @@ const MenuTitle = styled.h1`
   color: #333;
   margin-bottom: 1rem;
   font-weight: bold;
-  
+
   @media (min-width: 768px) {
     font-size: 3rem;
   }
@@ -146,7 +146,7 @@ const SearchContainer = styled.div`
     font-size: 0.95rem;
     transition: all 0.3s ease;
     width: 100%;
-    
+
     &::placeholder {
       color: #999;
       font-weight: 400;
@@ -194,7 +194,7 @@ const PizzaGrid = styled(Row)`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
-  
+
   @media (min-width: 1200px) {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -216,27 +216,24 @@ const NoResults = styled(Alert)`
 
 const MenuScreen = () => {
   const dispatch = useDispatch();
-  const [category, setCategory] = useState('all');
-  const [sort, setSort] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [category, setCategory] = useState("all");
+  const [sort, setSort] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const { loading, error, pizzas } = useSelector(state => state.pizzaReducer);
+  const { loading, error, pizzas } = useSelector((state) => state.pizzaReducer);
 
-  // Only fetch on initial load and when filters change
   useEffect(() => {
-    // Reset search when filters change
-    setSearchQuery('');
-    
-    // Only fetch if we have pizzas in the store
+    setSearchQuery("");
+
     if (!pizzas.length) {
-      dispatch(fetchPizzas(category !== 'all' ? category : '', sort));
+      dispatch(fetchPizzas(category !== "all" ? category : "", sort));
     }
-  }, []); // Empty dependency array for initial load only
+    console.log(category,"Category");
+  }, []); 
 
-  // Separate effect for filter changes
   useEffect(() => {
-    dispatch(fetchPizzas(category !== 'all' ? category : '', sort));
-  }, [category, sort]); // Only re-fetch when filters change
+    dispatch(fetchPizzas(category !== "all" ? category : "", sort));
+  }, [category, sort]); 
 
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -245,20 +242,21 @@ const MenuScreen = () => {
   // Memoize filtered pizzas for better performance
   const filteredPizzas = useMemo(() => {
     if (!searchQuery) return pizzas;
-    
+
     const query = searchQuery.toLowerCase().trim();
-    return pizzas.filter(pizza => 
-      pizza.name.toLowerCase().includes(query)
-    );
+    return pizzas.filter((pizza) => pizza.name.toLowerCase().includes(query));
   }, [pizzas, searchQuery]);
 
   return (
     <MenuSection>
       <MenuContainer>
         <MenuHeader>
-          <MenuTitle>Our <span>Menu</span></MenuTitle>
+          <MenuTitle>
+            Our <span>Menu</span>
+          </MenuTitle>
           <MenuDescription>
-            Discover our handcrafted foods made with fresh ingredients and baked to perfection
+            Discover our handcrafted foods made with fresh ingredients and baked
+            to perfection
           </MenuDescription>
         </MenuHeader>
 
@@ -269,7 +267,7 @@ const MenuScreen = () => {
                 <FaFilter />
                 Category
               </Form.Label>
-              <Form.Select 
+              <Form.Select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
               >
@@ -295,42 +293,40 @@ const MenuScreen = () => {
             </FilterGroup>
 
             <SearchContainer>
-              <SearchBar 
-                onSearch={handleSearch} 
-                suggestions={pizzas} 
-              />
-              
+              <SearchBar onSearch={handleSearch} suggestions={pizzas} />
             </SearchContainer>
           </FilterRow>
         </FiltersContainer>
 
-      {loading ? (
-        <Loader />
-      ) : error ? (
-        <Alert variant="danger">{error}</Alert>
-      ) : (
+        {loading ? (
+          <Loader />
+        ) : error ? (
+          <Alert variant="danger">{error}</Alert>
+        ) : (
           <PizzaGrid>
-          {filteredPizzas.map(pizza => (
+            {filteredPizzas.map((pizza) => (
               <div key={pizza._id}>
-              <PizzaCard pizza={pizza} />
+                <PizzaCard pizza={pizza} />
               </div>
-          ))}
-          {filteredPizzas.length === 0 && (
+            ))}
+            {filteredPizzas.length === 0 && (
               <div className="col-12">
                 <NoResults variant="info">
                   {searchQuery ? (
-                    <>No foods found matching <strong>"{searchQuery}"</strong>.</>
+                    <>
+                      No foods found matching <strong>"{searchQuery}"</strong>.
+                    </>
                   ) : (
-                    'No foods found. Try adjusting your filters.'
+                    "No foods found. Try adjusting your filters."
                   )}
                 </NoResults>
               </div>
-          )}
+            )}
           </PizzaGrid>
-      )}
+        )}
       </MenuContainer>
     </MenuSection>
   );
 };
 
-export default MenuScreen; 
+export default MenuScreen;

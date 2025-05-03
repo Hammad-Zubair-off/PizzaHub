@@ -1,20 +1,20 @@
-const swaggerJsDoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
+const swaggerJsDoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
 
 const swaggerOptions = {
   swaggerDefinition: {
-    openapi: '3.0.0',
+    openapi: "3.0.0",
     info: {
-      title: 'PizzaHub API',
-      version: '1.0.0',
-      description: 'PizzaHub REST API documentation',
+      title: "FoodieFiesta API",
+      version: "1.0.0",
+      description: "FoodieFiesta REST API documentation",
       contact: {
-        name: 'PizzaHub Support'
+        name: "FoodieFiesta Support",
       },
-      servers: ['http://localhost:5000']
-    }
+      servers: ["http://localhost:5000"],
+    },
   },
-  apis: ['./routes/*.js'] // Path to the API routes
+  apis: ["./routes/*.js"], 
 };
 
 const specs = swaggerJsDoc(swaggerOptions);
@@ -22,4 +22,4 @@ const specs = swaggerJsDoc(swaggerOptions);
 module.exports = {
   swaggerUi,
   specs,
-}; 
+};

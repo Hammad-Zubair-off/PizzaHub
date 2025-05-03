@@ -1,85 +1,85 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { Form, Alert, Button, Spinner } from 'react-bootstrap';
-import '../styles/Auth.css';
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { Form, Alert, Button, Spinner } from "react-bootstrap";
+import "../styles/Auth.css";
 
 const Registerscreen = () => {
   const navigate = useNavigate();
   const { register, error: authError } = useAuth();
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    cpassword: ''
+    name: "",
+    email: "",
+    password: "",
+    cpassword: "",
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [formErrors, setFormErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
-    
+
     // Clear error when user starts typing
     if (formErrors[name]) {
-      setFormErrors(prev => ({ ...prev, [name]: '' }));
+      setFormErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
   const validateForm = () => {
     const errors = {};
-    
+
     if (!formData.name.trim()) {
-      errors.name = 'Name is required';
+      errors.name = "Name is required";
     }
-    
+
     if (!formData.email) {
-      errors.email = 'Email is required';
+      errors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = 'Email is invalid';
+      errors.email = "Email is invalid";
     }
-    
+
     if (!formData.password) {
-      errors.password = 'Password is required';
+      errors.password = "Password is required";
     } else if (formData.password.length < 6) {
-      errors.password = 'Password must be at least 6 characters';
+      errors.password = "Password must be at least 6 characters";
     }
-    
+
     if (!formData.cpassword) {
-      errors.cpassword = 'Confirm password is required';
+      errors.cpassword = "Confirm password is required";
     } else if (formData.password !== formData.cpassword) {
-      errors.cpassword = 'Passwords do not match';
+      errors.cpassword = "Passwords do not match";
     }
-    
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
-    setError('');
+    setError("");
     setLoading(true);
-    
+
     try {
       const { name, email, password } = formData;
       const result = await register({ name, email, password });
-      
+
       if (result.success) {
-        navigate('/login');
+        navigate("/login");
       } else {
-        setError(result.error || 'Registration failed');
+        setError(result.error || "Registration failed");
       }
     } catch (err) {
-      setError(err.message || 'An error occurred during registration');
+      setError(err.message || "An error occurred during registration");
     } finally {
       setLoading(false);
     }
@@ -91,7 +91,10 @@ const Registerscreen = () => {
         <div className="auth-overlay">
           <div className="auth-content">
             <h1>Join Our Food Community</h1>
-            <p>Create an account to unlock a world of delicious possibilities. Fresh, hot foods are just moments away.</p>
+            <p>
+              Create an account to unlock a world of delicious possibilities.
+              Fresh, hot foods are just moments away.
+            </p>
           </div>
         </div>
       </div>
@@ -101,11 +104,9 @@ const Registerscreen = () => {
             <h2>Create Account</h2>
             <p>Fill in your details to get started</p>
           </div>
-          
+
           {(error || authError) && (
-            <Alert variant="danger">
-              {error || authError}
-            </Alert>
+            <Alert variant="danger">{error || authError}</Alert>
           )}
 
           <Form onSubmit={handleSubmit}>
@@ -173,11 +174,7 @@ const Registerscreen = () => {
               </Form.Control.Feedback>
             </Form.Group>
 
-            <Button 
-              variant="primary" 
-              type="submit"
-              disabled={loading}
-            >
+            <Button variant="primary" type="submit" disabled={loading}>
               {loading ? (
                 <>
                   <Spinner
@@ -190,13 +187,14 @@ const Registerscreen = () => {
                   />
                   Creating Account...
                 </>
-              ) : 'Create Account'}
+              ) : (
+                "Create Account"
+              )}
             </Button>
 
             <div className="auth-footer">
               <p>
-                Already have an account?{' '}
-                <Link to="/login">Sign In</Link>
+                Already have an account? <Link to="/login">Login</Link>
               </p>
             </div>
           </Form>

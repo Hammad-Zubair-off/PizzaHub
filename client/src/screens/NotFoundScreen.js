@@ -1,6 +1,6 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import '../styles/notFound.css';
+import React from "react";
+import { Link } from "react-router-dom";
+import "../styles/notFound.css";
 
 const NotFoundScreen = () => {
   return (
@@ -8,14 +8,17 @@ const NotFoundScreen = () => {
       <div className="not-found-content">
         <h1>404</h1>
         <h2>Oops! Page Not Found</h2>
-        <p>The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>
+        <p>
+          The page you are looking for might have been removed, had its name
+          changed, or is temporarily unavailable.
+        </p>
         <div className="not-found-actions">
-        <Link
-          to="/"
-          className="btn btn-primary w-48 flex justify-center items-center text-center"
-        >
-          Go to Home
-        </Link>
+          <Link
+            to="/"
+            className="btn btn-primary w-48 flex justify-center items-center text-center"
+          >
+            Go to Home
+          </Link>
           <Link to="/menu" className="btn btn-secondary">
             View Menu
           </Link>
@@ -25,4 +28,4 @@ const NotFoundScreen = () => {
   );
 };
 
-export default NotFoundScreen; 
+export default NotFoundScreen;

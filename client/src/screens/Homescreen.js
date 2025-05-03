@@ -1,25 +1,23 @@
-import React, { useEffect } from 'react';
-import styled from 'styled-components';
+import React, { useEffect } from "react";
+import styled from "styled-components";
 
-import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchPizzas } from '../actions/pizzaActions';
-import { theme } from '../styles/theme';
-import BannerImage from '../Images/BannerAdvertise.png';
-import { FaPizzaSlice } from 'react-icons/fa';
-import { AiFillStar } from 'react-icons/ai';
-import Loader from '../components/Loader';
-import Error from '../components/Error';
-import BoyChefImage from '../Images/Boychef.png';
-    
-   
+import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchPizzas } from "../actions/pizzaActions";
+import { theme } from "../styles/theme";
+import BannerImage from "../Images/BannerAdvertise.png";
+import { FaPizzaSlice } from "react-icons/fa";
+import { AiFillStar } from "react-icons/ai";
+import Loader from "../components/Loader";
+import Error from "../components/Error";
+import BoyChefImage from "../Images/Boychef.png";
 
 const HeroSection = styled.section`
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 4rem 6rem;
-  background-color: #FFF8F3;
+  background-color: #fff8f3;
   min-height: 80vh;
 
   @media (max-width: 1024px) {
@@ -85,7 +83,7 @@ const LogoText = styled.span`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  
+
   svg {
     color: ${theme.colors.primary};
     font-size: 1.2em;
@@ -188,7 +186,7 @@ const DeliveryBadge = styled.div`
   font-size: 14px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 2;
-  
+
   svg {
     color: ${theme.colors.primary};
     width: 16px;
@@ -256,7 +254,7 @@ const ProfileBadge = styled.div`
       color: #666;
 
       .stars {
-        color: #FFB800;
+        color: #ffb800;
       }
 
       .likes {
@@ -297,13 +295,17 @@ const FeatureCard = styled.div`
   overflow: hidden;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 4px;
-    background: linear-gradient(90deg, ${theme.colors.primary}, ${theme.colors.secondary});
+    background: linear-gradient(
+      90deg,
+      ${theme.colors.primary},
+      ${theme.colors.secondary}
+    );
     transform: scaleX(0);
     transform-origin: left;
     transition: transform 0.4s ease;
@@ -340,7 +342,7 @@ const FeatureCard = styled.div`
     display: inline-block;
 
     &::after {
-      content: '';
+      content: "";
       position: absolute;
       bottom: -4px;
       left: 50%;
@@ -393,9 +395,9 @@ const FeatureCard = styled.div`
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
-    
+
     &::before {
-      content: '';
+      content: "";
       position: absolute;
       top: 0;
       left: 0;
@@ -449,7 +451,7 @@ const FeatureCard = styled.div`
 
 const BestSellersSection = styled.section`
   padding: 4rem 6rem;
-  background-color: #FFF8F3;
+  background-color: #fff8f3;
 
   @media (max-width: 1024px) {
     padding: 3rem 4rem;
@@ -469,7 +471,7 @@ const SectionTitle = styled.div`
     font-weight: bold;
     color: #333;
     margin-bottom: 1rem;
-    
+
     span {
       margin-left: 8px;
     }
@@ -556,7 +558,7 @@ const DishRating = styled.div`
   margin-bottom: 1rem;
 
   svg {
-    color: #FFB800;
+    color: #ffb800;
     font-size: 16px;
   }
 `;
@@ -595,7 +597,7 @@ const ChefSection = styled.section`
   align-items: center;
   justify-content: space-between;
   padding: 4rem 6rem;
-  background-color: #FFF8F3;
+  background-color: #fff8f3;
   overflow: hidden;
 
   @media (max-width: 1024px) {
@@ -660,7 +662,7 @@ const ChefImageContainer = styled.div`
   position: relative;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     width: 500px;
     height: 500px;
@@ -678,7 +680,8 @@ const ChefImageContainer = styled.div`
   }
 
   @keyframes float {
-    0%, 100% {
+    0%,
+    100% {
       transform: translateY(0);
     }
     50% {
@@ -722,60 +725,56 @@ const features = [
     id: 1,
     title: "Quality Food",
     heading: "Fresh Ingredients",
-    description: "We use only the freshest ingredients to ensure the best quality in every dish. Our ingredients are locally sourced and carefully selected."
+    description:
+      "We use only the freshest ingredients to ensure the best quality in every dish. Our ingredients are locally sourced and carefully selected.",
   },
   {
     id: 2,
     title: "Fast Service",
     heading: "Fast Delivery",
-    description: "Quick and reliable delivery service to get your food while it's hot. Track your order in real-time with our delivery system."
+    description:
+      "Quick and reliable delivery service to get your food while it's hot. Track your order in real-time with our delivery system.",
   },
   {
     id: 3,
     title: "Secure Pay",
     heading: "Easy Payment",
-    description: "Multiple secure payment options for your convenience and peace of mind. We support all major payment methods."
+    description:
+      "Multiple secure payment options for your convenience and peace of mind. We support all major payment methods.",
   },
   {
     id: 4,
     title: "Mobile Access",
     heading: "Mobile App",
-    description: "Order easily through our mobile app with exclusive offers and tracking. Get special discounts and rewards."
-  }
+    description:
+      "Order easily through our mobile app with exclusive offers and tracking. Get special discounts and rewards.",
+  },
 ];
 
 const Homescreen = () => {
   const dispatch = useDispatch();
-  
-  // Debug: Log the entire Redux state
-  const fullState = useSelector(state => state);
-  console.log("Full Redux State:", fullState);
-  // FIXED: Changed from getAllPizzasReducer to pizzaReducer based on console logs
-const pizzaState = useSelector((state) => state.pizzaReducer);
-  console.log("Pizza State:", pizzaState);
-const { loading, error, pizzas = [] } = pizzaState || { loading: false, error: null, pizzas: [] };
-  // Updated selector with debug logging
 
+  const fullState = useSelector((state) => state);
+  const pizzaState = useSelector((state) => state.pizzaReducer);
+  const {
+    loading,
+    error,
+    pizzas = [],
+  } = pizzaState || { loading: false, error: null, pizzas: [] };
 
   useEffect(() => {
-    console.log("Dispatching fetchfoods action");
     dispatch(fetchPizzas());
   }, [dispatch]);
 
-  // Helper function to get price from pizza object
   const getPizzaPrice = (pizza) => {
     if (!pizza.prices) return 0;
-    
-    console.log("Pizza prices structure:", pizza.prices);
-    
-    // Handle different price data structures
+
+
     if (Array.isArray(pizza.prices) && pizza.prices.length > 0) {
-      // If prices is an array of objects with varient and price
-      if (typeof pizza.prices[0] === 'object' && pizza.prices[0].price) {
+      if (typeof pizza.prices[0] === "object" && pizza.prices[0].price) {
         return pizza.prices[0].price;
       }
-      // If prices is a direct array of numbers
-      if (typeof pizza.prices[0] === 'number') {
+      if (typeof pizza.prices[0] === "number") {
         return pizza.prices[0];
       }
     }
@@ -787,49 +786,77 @@ const { loading, error, pizzas = [] } = pizzaState || { loading: false, error: n
       <HeroSection>
         <LeftContent>
           <Title>
-            Desire <LogoText><FaPizzaSlice /> Food</LogoText><br />
+            Desire{" "}
+            <LogoText>
+              <FaPizzaSlice /> Food
+            </LogoText>
+            <br />
             for Your Taste
           </Title>
           <Description>
-            Food is what we eat to stay alive and healthy. It comes in many different forms and flavors, from fruits and vegetables to meats and grains.
+            Food is what we eat to stay alive and healthy. It comes in many
+            different forms and flavors, from fruits and vegetables to meats and
+            grains.
           </Description>
           <OrderButton to="/menu">Order Now</OrderButton>
         </LeftContent>
-        
+
         <RightContent>
           <BannerCard>
-            <BannerImageStyled 
-              src={BannerImage} 
-              alt="Food delivery"
-            />
+            <BannerImageStyled src={BannerImage} alt="Food delivery" />
             <DeliveryBadge>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M12 2L2 7L12 12L22 7L12 2Z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
               Delivery in 30 mint
             </DeliveryBadge>
             <LocationBadge>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
               at destination
             </LocationBadge>
             <ProfileBadge>
-              <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="Ali Ahmad" />
+              <img
+                src="https://randomuser.me/api/portraits/men/1.jpg"
+                alt="Ali Ahmad"
+              />
               <div className="profile-info">
                 <span className="name">Ali Ahmad</span>
                 <div className="rating">
                   <span className="stars">★</span>
                   4.5
-                  <span style={{ marginLeft: '8px' }}>1k Likes</span>
+                  <span style={{ marginLeft: "8px" }}>1k Likes</span>
                 </div>
               </div>
             </ProfileBadge>
           </BannerCard>
         </RightContent>
       </HeroSection>
-
-      
 
       <FeaturesSection>
         {features.map((feature) => (
@@ -839,12 +866,30 @@ const { loading, error, pizzas = [] } = pizzaState || { loading: false, error: n
             <h3>{feature.heading}</h3>
             <p>{feature.description}</p>
             <Link to="/about" className="learn-more">
-              Learn More 
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3.33337 8H12.6667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M8 3.33337L12.6667 8.00004L8 12.6667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              Learn More
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M3.33337 8H12.6667"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M8 3.33337L12.6667 8.00004L8 12.6667"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
-        </Link>
+            </Link>
           </FeatureCard>
         ))}
       </FeaturesSection>
@@ -855,8 +900,10 @@ const { loading, error, pizzas = [] } = pizzaState || { loading: false, error: n
             Meet Our <span>Expert Chef</span> Who Makes Your Food Special
           </h2>
           <p>
-            Our talented chef brings years of culinary expertise to create the perfect blend of flavors in every dish. 
-            Using only the finest ingredients and traditional techniques, we ensure that each meal is crafted with care and passion.
+            Our talented chef brings years of culinary expertise to create the
+            perfect blend of flavors in every dish. Using only the finest
+            ingredients and traditional techniques, we ensure that each meal is
+            crafted with care and passion.
           </p>
           <StatsContainer>
             <StatItem>

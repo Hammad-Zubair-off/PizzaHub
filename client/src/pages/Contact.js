@@ -1,29 +1,29 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap';
-import { theme } from '../styles/theme';
+import React, { useState } from "react";
+import styled from "styled-components";
+import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
+import { theme } from "../styles/theme";
 
 const ContactContainer = styled.div`
   padding: 6rem 0;
-  background: linear-gradient(135deg, #FCE4D6 0%, #FFE9E3 50%, #FFF8F3 100%);
+  background: linear-gradient(135deg, #fce4d6 0%, #ffe9e3 50%, #fff8f3 100%);
   min-height: calc(100vh - 80px);
 `;
 
 const Title = styled.h1`
-  color: #E44D26;
-  font-family: 'Nunito', sans-serif;
+  color: #e44d26;
+  font-family: "Nunito", sans-serif;
   font-weight: 700;
   font-size: 3.5rem;
   margin-bottom: 3rem;
   text-align: center;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-  
+
   &:after {
-    content: '';
+    content: "";
     display: block;
     width: 80px;
     height: 4px;
-    background: #E44D26;
+    background: #e44d26;
     margin: 1rem auto;
     border-radius: 2px;
   }
@@ -49,7 +49,7 @@ const InfoSection = styled.div`
   margin-bottom: 2.5rem;
   padding-bottom: 2rem;
   border-bottom: 1px solid rgba(228, 77, 38, 0.1);
-  
+
   &:last-child {
     margin-bottom: 0;
     padding-bottom: 0;
@@ -57,38 +57,38 @@ const InfoSection = styled.div`
   }
 
   h3 {
-    color: #E44D26;
+    color: #e44d26;
     margin-bottom: 1.5rem;
-    font-family: 'Nunito', sans-serif;
+    font-family: "Nunito", sans-serif;
     font-size: 1.8rem;
     font-weight: 600;
     position: relative;
     padding-left: 1rem;
 
     &:before {
-      content: '';
+      content: "";
       position: absolute;
       left: 0;
       top: 0;
       height: 100%;
       width: 4px;
-      background: #E44D26;
+      background: #e44d26;
       border-radius: 2px;
     }
   }
 
   p {
-    color: #2D3436;
+    color: #2d3436;
     margin-bottom: 1rem;
     display: flex;
     align-items: center;
     gap: 1rem;
-    font-family: 'Nunito', sans-serif;
+    font-family: "Nunito", sans-serif;
     font-size: 1.1rem;
     line-height: 1.6;
 
     i {
-      color: #E44D26;
+      color: #e44d26;
       font-size: 1.2rem;
       width: 24px;
       text-align: center;
@@ -109,9 +109,9 @@ const InfoSection = styled.div`
 
 const StyledForm = styled(Form)`
   .form-label {
-    color: #2D3436;
+    color: #2d3436;
     font-weight: 600;
-    font-family: 'Nunito', sans-serif;
+    font-family: "Nunito", sans-serif;
     font-size: 1.1rem;
     margin-bottom: 0.5rem;
   }
@@ -119,25 +119,25 @@ const StyledForm = styled(Form)`
   .form-control {
     border-radius: 12px;
     padding: 0.8rem 1.2rem;
-    border: 2px solid #E8E8E8;
-    font-family: 'Nunito', sans-serif;
+    border: 2px solid #e8e8e8;
+    font-family: "Nunito", sans-serif;
     font-size: 1rem;
     transition: all 0.3s ease;
-    background-color: #FAFAFA;
-    color: #2D3436;
-    
+    background-color: #fafafa;
+    color: #2d3436;
+
     &:focus {
-      border-color: #E44D26;
+      border-color: #e44d26;
       box-shadow: 0 0 0 0.2rem rgba(228, 77, 38, 0.15);
       background-color: white;
     }
 
     &::placeholder {
-      color: #95A5A6;
+      color: #95a5a6;
     }
 
     &:hover {
-      border-color: #E44D26;
+      border-color: #e44d26;
       background-color: white;
     }
   }
@@ -149,11 +149,11 @@ const StyledForm = styled(Form)`
 `;
 
 const SubmitButton = styled(Button)`
-  background: linear-gradient(135deg, #E44D26 0%, #F16529 100%);
+  background: linear-gradient(135deg, #e44d26 0%, #f16529 100%);
   border: none;
   padding: 1rem 2rem;
   font-weight: 600;
-  font-family: 'Nunito', sans-serif;
+  font-family: "Nunito", sans-serif;
   font-size: 1.1rem;
   border-radius: 12px;
   width: 100%;
@@ -164,7 +164,7 @@ const SubmitButton = styled(Button)`
   letter-spacing: 1px;
 
   &:hover {
-    background: linear-gradient(135deg, #F16529 0%, #E44D26 100%);
+    background: linear-gradient(135deg, #f16529 0%, #e44d26 100%);
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(228, 77, 38, 0.3);
   }
@@ -174,7 +174,7 @@ const SubmitButton = styled(Button)`
   }
 
   &:before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: -100%;
@@ -196,19 +196,19 @@ const SubmitButton = styled(Button)`
 
 const StyledAlert = styled(Alert)`
   border-radius: 12px;
-  font-family: 'Nunito', sans-serif;
+  font-family: "Nunito", sans-serif;
   border: none;
-  
+
   &.alert-success {
-    background-color: #D4EDDA;
+    background-color: #d4edda;
     color: #155724;
-    border-left: 4px solid #28A745;
+    border-left: 4px solid #28a745;
   }
 `;
 
 const FormTitle = styled.h3`
-  color: #E44D26;
-  font-family: 'Nunito', sans-serif;
+  color: #e44d26;
+  font-family: "Nunito", sans-serif;
   font-size: 1.8rem;
   font-weight: 600;
   margin-bottom: 2rem;
@@ -216,24 +216,24 @@ const FormTitle = styled.h3`
   padding-left: 1rem;
 
   &:before {
-    content: '';
+    content: "";
     position: absolute;
     left: 0;
     top: 0;
     height: 100%;
     width: 4px;
-    background: #E44D26;
+    background: #e44d26;
     border-radius: 2px;
   }
 `;
 
 const SocialLink = styled.a`
   text-decoration: none;
-  color: #2D3436;
+  color: #2d3436;
   transition: all 0.3s ease;
 
   &:hover {
-    color: #E44D26;
+    color: #e44d26;
     text-decoration: none;
     transform: translateX(5px);
   }
@@ -241,28 +241,28 @@ const SocialLink = styled.a`
 
 const Contact = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
   });
-  const [status, setStatus] = useState({ type: '', message: '' });
+  const [status, setStatus] = useState({ type: "", message: "" });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setStatus({
-      type: 'success',
-      message: 'Thank you for your message! We will get back to you soon.'
+      type: "success",
+      message: "Thank you for your message! We will get back to you soon.",
     });
-    setFormData({ name: '', email: '', subject: '', message: '' });
+    setFormData({ name: "", email: "", subject: "", message: "" });
   };
 
   return (
@@ -284,7 +284,7 @@ const Contact = () => {
                 </p>
                 <p>
                   <i className="fas fa-envelope"></i>
-                  contact@pizzahub.com
+                  hammadzubairofficial@gmail.com
                 </p>
               </InfoSection>
               <InfoSection>
@@ -381,9 +381,7 @@ const Contact = () => {
                     placeholder="Your Message"
                   />
                 </Form.Group>
-                <SubmitButton type="submit">
-                  Send Message
-                </SubmitButton>
+                <SubmitButton type="submit">Send Message</SubmitButton>
               </StyledForm>
             </ContactCard>
           </Col>
@@ -393,4 +391,4 @@ const Contact = () => {
   );
 };
 
-export default Contact; 
+export default Contact;

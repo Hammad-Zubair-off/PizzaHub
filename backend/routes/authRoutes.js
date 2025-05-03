@@ -18,7 +18,7 @@ router.post("/admin/login", async (req, res) => {
       });
     }
 
-    if (email !== "admin@pizzahub.com" || password !== "admin") {
+    if (email !== "admin@FoodieFiesta.com" || password !== "admin") {
       return res.status(401).json({
         success: false,
         message: "Invalid admin credentials",
@@ -129,7 +129,6 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(email, "neechey");
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -137,7 +136,6 @@ router.post("/login", async (req, res) => {
       });
     }
     const user = await User.findOne({ email });
-    console.log(user);
     if (!user) {
       return res.status(401).json({
         success: false,

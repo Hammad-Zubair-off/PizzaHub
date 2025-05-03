@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Form, InputGroup, ListGroup } from 'react-bootstrap';
-import { FaSearch } from 'react-icons/fa';
-import styled from 'styled-components';
-import { theme } from '../styles/theme';
-import './SearchBar.css';
+import React, { useState, useEffect, useRef } from "react";
+import { Form, InputGroup, ListGroup } from "react-bootstrap";
+import { FaSearch } from "react-icons/fa";
+import styled from "styled-components";
+import { theme } from "../styles/theme";
+import "./SearchBar.css";
 
 const SearchWrapper = styled.div`
   position: relative;
@@ -105,93 +105,90 @@ const SuggestionItem = styled(ListGroup.Item)`
 `;
 
 const SearchBar = ({ onSearch, suggestions = [] }) => {
-    const [searchQuery, setSearchQuery] = useState('');
-    const [showSuggestions, setShowSuggestions] = useState(false);
-    const [filteredSuggestions, setFilteredSuggestions] = useState([]);
-    const searchRef = useRef(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [filteredSuggestions, setFilteredSuggestions] = useState([]);
+  const searchRef = useRef(null);
 
-    // Filter suggestions based on search query - ONLY by name
-    useEffect(() => {
-        if (searchQuery.trim()) {
-            const filtered = suggestions.filter(item => 
-                item.name.toLowerCase().includes(searchQuery.toLowerCase())
-            );
-            setFilteredSuggestions(filtered);
-            setShowSuggestions(true);
-        } else {
-            setFilteredSuggestions([]);
-            setShowSuggestions(false);
-        }
-    }, [searchQuery, suggestions]);
+  useEffect(() => {
+    if (searchQuery.trim()) {
+      const filtered = suggestions.filter((item) =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredSuggestions(filtered);
+      setShowSuggestions(true);
+    } else {
+      setFilteredSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [searchQuery, suggestions]);
 
-    // Handle click outside to close suggestions
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (searchRef.current && !searchRef.current.contains(event.target)) {
-                setShowSuggestions(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-
-    // Trigger search when query changes
-    useEffect(() => {
-        onSearch(searchQuery);
-    }, [searchQuery, onSearch]);
-
-    const handleSuggestionClick = (suggestion) => {
-        setSearchQuery(suggestion.name);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
         setShowSuggestions(false);
+      }
     };
 
-    return (
-        <SearchWrapper ref={searchRef}>
-            <Form>
-                <div className="position-relative">
-                    <SearchInput
-                        type="search"
-                        placeholder="Search by Food name..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        autoComplete="off"
-                    />
-                    <SearchButton type="button">
-                        <FaSearch size={14} />
-                    </SearchButton>
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    onSearch(searchQuery);
+  }, [searchQuery, onSearch]);
+
+  const handleSuggestionClick = (suggestion) => {
+    setSearchQuery(suggestion.name);
+    setShowSuggestions(false);
+  };
+
+  return (
+    <SearchWrapper ref={searchRef}>
+      <Form>
+        <div className="position-relative">
+          <SearchInput
+            type="search"
+            placeholder="Search by Food name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            autoComplete="off"
+          />
+          <SearchButton type="button">
+            <FaSearch size={14} />
+          </SearchButton>
+        </div>
+      </Form>
+
+      {showSuggestions && filteredSuggestions.length > 0 && (
+        <SuggestionsDropdown>
+          {filteredSuggestions.map((item, index) => (
+            <SuggestionItem
+              key={index}
+              action
+              onClick={() => handleSuggestionClick(item)}
+            >
+              <div className="d-flex align-items-center">
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="suggestion-image me-2"
+                />
+                <div>
+                  <div className="suggestion-name">{item.name}</div>
+                  <div className="suggestion-price">
+                    From Rs. {Math.min(...item.prices.map((p) => p.price))}
+                  </div>
                 </div>
-            </Form>
-            
-            {showSuggestions && filteredSuggestions.length > 0 && (
-                <SuggestionsDropdown>
-                    {filteredSuggestions.map((item, index) => (
-                        <SuggestionItem 
-                            key={index} 
-                            action 
-                            onClick={() => handleSuggestionClick(item)}
-                        >
-                            <div className="d-flex align-items-center">
-                                <img 
-                                    src={item.image} 
-                                    alt={item.name} 
-                                    className="suggestion-image me-2"
-                                />
-                                <div>
-                                    <div className="suggestion-name">{item.name}</div>
-                                    <div className="suggestion-price">
-                                        From Rs. {Math.min(...item.prices.map(p => p.price))}
-                                    </div>
-                                </div>
-                            </div>
-                        </SuggestionItem>
-                    ))}
-                </SuggestionsDropdown>
-            )}
-        </SearchWrapper>
-    );
+              </div>
+            </SuggestionItem>
+          ))}
+        </SuggestionsDropdown>
+      )}
+    </SearchWrapper>
+  );
 };
 
-export default SearchBar; 
+export default SearchBar;

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
-import Loader from '../components/Loader';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useAuth } from "../context/AuthContext";
+import Loader from "../components/Loader";
 
 export default function UserManagement() {
   const navigate = useNavigate();
@@ -10,13 +10,13 @@ export default function UserManagement() {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedRole, setSelectedRole] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedRole, setSelectedRole] = useState("all");
 
   useEffect(() => {
     // Redirect if not admin
     if (!loading && !isAdmin()) {
-      navigate('/admin');
+      navigate("/admin");
       return;
     }
 
@@ -25,14 +25,14 @@ export default function UserManagement() {
       try {
         setIsLoading(true);
         setError(null);
-        
-        const response = await axios.get('/api/auth/users', {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+
+        const response = await axios.get("/api/auth/users", {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
         setUsers(response.data.users);
       } catch (err) {
-        console.error('Error fetching users:', err);
-        setError('Failed to load users. Please try again later.');
+        console.error("Error fetching users:", err);
+        setError("Failed to load users. Please try again later.");
       } finally {
         setIsLoading(false);
       }
@@ -50,48 +50,53 @@ export default function UserManagement() {
   };
 
   const handleDeleteUser = async (userId) => {
-    if (!window.confirm('Are you sure you want to delete this user?')) {
+    if (!window.confirm("Are you sure you want to delete this user?")) {
       return;
     }
 
     try {
       await axios.delete(`/api/auth/users/${userId}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-      
+
       // Remove user from state
-      setUsers(users.filter(user => user._id !== userId));
+      setUsers(users.filter((user) => user._id !== userId));
     } catch (err) {
-      console.error('Error deleting user:', err);
-      alert('Failed to delete user. Please try again later.');
+      console.error("Error deleting user:", err);
+      alert("Failed to delete user. Please try again later.");
     }
   };
 
   const handleChangeRole = async (userId, newRole) => {
     try {
-      await axios.put(`/api/auth/users/${userId}/role`, 
+      await axios.put(
+        `/api/auth/users/${userId}/role`,
         { role: newRole },
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }}
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
       );
-      
+
       // Update user in state
-      setUsers(users.map(user => 
-        user._id === userId ? { ...user, role: newRole } : user
-      ));
+      setUsers(
+        users.map((user) =>
+          user._id === userId ? { ...user, role: newRole } : user
+        )
+      );
     } catch (err) {
-      console.error('Error updating user role:', err);
-      alert('Failed to update user role. Please try again later.');
+      console.error("Error updating user role:", err);
+      alert("Failed to update user role. Please try again later.");
     }
   };
 
   // Filter users based on search term and role
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = 
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch =
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesRole = selectedRole === 'all' || user.role === selectedRole;
-    
+
+    const matchesRole = selectedRole === "all" || user.role === selectedRole;
+
     return matchesSearch && matchesRole;
   });
 
@@ -112,7 +117,7 @@ export default function UserManagement() {
   return (
     <div className="container mt-4">
       <h2 className="text-center mb-4">User Management</h2>
-      
+
       <div className="row mb-4">
         <div className="col-md-6">
           <div className="input-group">
@@ -131,9 +136,9 @@ export default function UserManagement() {
         <div className="col-md-6">
           <div className="input-group">
             <span className="input-group-text">Filter by Role</span>
-            <select 
-              className="form-select" 
-              value={selectedRole} 
+            <select
+              className="form-select"
+              value={selectedRole}
               onChange={handleRoleFilter}
             >
               <option value="all">All Roles</option>
@@ -143,7 +148,7 @@ export default function UserManagement() {
           </div>
         </div>
       </div>
-      
+
       <div className="card shadow">
         <div className="card-body">
           {filteredUsers.length > 0 ? (
@@ -158,15 +163,17 @@ export default function UserManagement() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredUsers.map(user => (
+                  {filteredUsers.map((user) => (
                     <tr key={user._id}>
                       <td>{user.name}</td>
                       <td>{user.email}</td>
                       <td>
                         <select
                           className="form-select form-select-sm"
-                          value={user.role || 'customer'}
-                          onChange={(e) => handleChangeRole(user._id, e.target.value)}
+                          value={user.role || "customer"}
+                          onChange={(e) =>
+                            handleChangeRole(user._id, e.target.value)
+                          }
                         >
                           <option value="customer">Customer</option>
                           <option value="admin">Admin</option>
@@ -192,4 +199,4 @@ export default function UserManagement() {
       </div>
     </div>
   );
-} 
+}

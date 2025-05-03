@@ -72,8 +72,6 @@ router.get('/all', authenticate, async (req, res) => {
         });
     }
 });
-
-// Update order status (admin only)
 router.put('/:orderId/status', authenticate, async (req, res) => {
     if (req.user.role !== 'admin') {
         return res.status(403).json({

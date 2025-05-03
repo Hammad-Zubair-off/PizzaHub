@@ -6,7 +6,7 @@ const EditProduct = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const product = useMemo(() => location.state?.data || {}, [location.state]);
-  
+
   const [productName, setProductName] = useState("");
   const [selectedVariants, setSelectedVariants] = useState([]);
   const [prices, setPrices] = useState({});
@@ -24,11 +24,11 @@ const EditProduct = () => {
       setSelectedCategory(product.category || "");
       setProductImage(product.image || "");
       setProductDescription(product.description || "");
-      
+
       // Convert prices array to object format for easier editing
       const priceObj = {};
       if (product.prices && Array.isArray(product.prices)) {
-        product.prices.forEach(item => {
+        product.prices.forEach((item) => {
           priceObj[item.varient] = item.price;
         });
       }
@@ -41,7 +41,9 @@ const EditProduct = () => {
 
   // Handle variant selection
   const handleVariantChange = (e) => {
-    const variants = [...e.target.selectedOptions].map((option) => option.value);
+    const variants = [...e.target.selectedOptions].map(
+      (option) => option.value
+    );
     setSelectedVariants(variants);
 
     // Keep existing prices and initialize any new variants
@@ -111,10 +113,13 @@ const EditProduct = () => {
   return (
     <div className="container mt-4">
       <h2 className="text-center mb-4">Edit Product</h2>
-      
+
       {error && <div className="alert alert-danger">{error}</div>}
-      
-      <form onSubmit={handleSubmit} className="p-4 border rounded shadow-sm bg-light">
+
+      <form
+        onSubmit={handleSubmit}
+        className="p-4 border rounded shadow-sm bg-light"
+      >
         {/* Product Name */}
         <div className="mb-3">
           <label className="form-label">Product Name</label>
@@ -130,12 +135,19 @@ const EditProduct = () => {
         {/* Variants Selection */}
         <div className="mb-3">
           <label className="form-label">Select Variants</label>
-          <select multiple className="form-control" onChange={handleVariantChange} value={selectedVariants}>
+          <select
+            multiple
+            className="form-control"
+            onChange={handleVariantChange}
+            value={selectedVariants}
+          >
             <option value="small">Small</option>
             <option value="medium">Medium</option>
             <option value="large">Large</option>
           </select>
-          <small className="text-muted">Hold Ctrl/Cmd to select multiple variants</small>
+          <small className="text-muted">
+            Hold Ctrl/Cmd to select multiple variants
+          </small>
         </div>
 
         {/* Prices */}
@@ -160,7 +172,12 @@ const EditProduct = () => {
         {/* Category */}
         <div className="mb-3">
           <label className="form-label">Category</label>
-          <select className="form-control" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} required>
+          <select
+            className="form-control"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            required
+          >
             <option value="">Select Category</option>
             <option value="veg">Vegetarian</option>
             <option value="non-veg">Non-Vegetarian</option>
@@ -195,7 +212,11 @@ const EditProduct = () => {
 
         {/* Submit Button */}
         <div className="d-flex justify-content-between">
-          <button type="button" className="btn btn-secondary" onClick={() => navigate("/productList")}>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => navigate("/productList")}
+          >
             Cancel
           </button>
           <button type="submit" className="btn btn-primary" disabled={loading}>

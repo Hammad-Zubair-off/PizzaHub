@@ -1,54 +1,53 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import AuthForm from '../components/AuthForm';
-import FormInput from '../components/FormInput';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import AuthForm from "../components/AuthForm";
+import FormInput from "../components/FormInput";
 
 const Admin = () => {
   const navigate = useNavigate();
   const { adminLogin, error, loading } = useAuth();
   const [formData, setFormData] = useState({
-    username: '',
-    password: ''
+    username: "",
+    password: "",
   });
   const [formErrors, setFormErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-    
-    // Clear error when user starts typing
+
     if (formErrors[name]) {
-      setFormErrors({ ...formErrors, [name]: '' });
+      setFormErrors({ ...formErrors, [name]: "" });
     }
   };
 
   const validateForm = () => {
     const errors = {};
-    
+
     if (!formData.username) {
-      errors.username = 'Username is required';
+      errors.username = "Username is required";
     }
-    
+
     if (!formData.password) {
-      errors.password = 'Password is required';
+      errors.password = "Password is required";
     }
-    
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     const result = await adminLogin(formData.username, formData.password);
-    
+
     if (result.success) {
-      navigate('/productList');
+      navigate("/productList");
     }
   };
 
@@ -60,6 +59,7 @@ const Admin = () => {
       error={error}
       loading={loading}
     >
+      <p>admin@FoodieFiesta.com</p>
       <FormInput
         label="Username"
         type="text"
@@ -70,7 +70,7 @@ const Admin = () => {
         required
         error={formErrors.username}
       />
-      
+      <p>admin</p>
       <FormInput
         label="Password"
         type="password"
